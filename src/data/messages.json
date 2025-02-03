@@ -1,0 +1,58 @@
+{
+    "common": {
+        "bot_name": "マネージャー",
+        "bot_message": "「{0}が起動しました」",
+        "embeds": {
+            "author_name": "Larva06",
+            "author_icon": "https://avatars.githubusercontent.com/u/123287787",
+            "footer_text": "Copyright 2025 Larva06"
+        }
+    },
+    "commands": {
+        "task": {
+            "name": "task",
+            "description": "Larva06メンバーにタスクを依頼することが出来ます",
+            "stringOption": {
+                "1": {
+                    "description": "依頼する内容を入力してください。改行は出来ません！"
+                },
+                "2": {
+                    "description": "締切日を YYYY/MM/DD 形式で入力してください。"
+                },
+                "3": {
+                    "description": "依頼をお願いするユーザーを選択してください。"
+                },
+                "4": {
+                    "description": "なにか伝えたいことがあれば書いてください！"
+                }
+            }
+        }
+    },
+    "guild": {
+        "task": {
+            "title": "<@{0}> 依頼が来ています！",
+            "reTitle": "<@{0}> 締め切り日の24時間前です！",
+            "embeds": {
+                "field1_name": "依頼内容",
+                "field2_name": "締切日",
+                "field3_name": "依頼人",
+                "field4_name": "備考"
+            }
+        },
+        "taskCheck": {
+            "title": "{0}さん へ下記の内容で依頼を送信します！",
+            "embeds": {
+                "field1_name": "依頼内容",
+                "field2_name": "締切日",
+                "field3_name": "備考"
+            }
+        }
+    },
+    "log": {
+        "commandRegSuc": "コマンドの登録に成功しました！",
+        "commandRegFail": "コマンドの登録に失敗しました！",
+        "spreadSuc": "スプレッドシートへの書き込みに成功しました！",
+        "spreadFail": "スプレッドシートへの書き込みに失敗しました！",
+        "messageSendFail": "送信するテキストチャンネルが見つかりません！"
+    }
+}

@@ -1,0 +1,27 @@
+{
+  "name": "larva-todo",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "ts-node src/main.ts",
+    "commands": "ts-node src/deploy-commands.ts",
+    "start": "node build/main.js",
+    "compile": "tsc -p .",
+    "format": "prettier . --write"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@types/node": "^22.13.0",
+    "discord.js": "^14.17.3",
+    "dotenv": "^16.4.7",
+    "googleapis": "^144.0.0",
+    "typescript": "^5.7.3"
+  },
+  "devDependencies": {
+    "eslint": "^9.19.0",
+    "ts-node": "^10.9.2"
+  }
+}
