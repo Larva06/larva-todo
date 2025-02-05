@@ -31,7 +31,7 @@ export async function writeToSheet(
             valueInputOption: 'USER_ENTERED',
             requestBody: {
                 values: [
-                    [taskContent, deadLine, user, notes, timestamp || '未対応'] 
+                    [taskContent, deadLine, user, notes, timestamp] 
                 ],
             },
         });
