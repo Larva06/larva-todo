@@ -1,6 +1,6 @@
 // main.ts
 
-import { GatewayIntentBits, Client, REST, Routes, Events } from 'discord.js';
+import { GatewayIntentBits, Client, REST, Routes, Events, Partials } from 'discord.js';
 import { google } from 'googleapis';
 import { TOKEN } from './env';
 import format from './format';
@@ -8,11 +8,12 @@ import messages from './data/messages.json';
 import taskEmbed from './embeds/task';
 
 // Slash command
-import task from './commands/task';
+import task, { monitorReactions } from './commands/task';
 
 
 const client = new Client({
-    intents: [GatewayIntentBits.Guilds],
+    intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessageReactions],
+    partials: [Partials.Reaction]
 });
 
 client.once('ready', () => {
@@ -30,5 +31,7 @@ client.on('interactionCreate', async (interaction) => {
       await task.execute(interaction);
     }
 });
+
+monitorReactions(client);
 
 client.login(TOKEN())
