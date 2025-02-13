@@ -13,7 +13,7 @@ import task, { monitorReactions } from './commands/task';
 
 const client = new Client({
     intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessageReactions],
-    partials: [Partials.Reaction]
+    partials: [Partials.Message, Partials.Reaction]
 });
 
 client.once('ready', () => {
