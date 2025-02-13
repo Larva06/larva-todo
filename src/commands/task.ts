@@ -1,4 +1,4 @@
-import { CommandInteraction, CommandInteractionOptionResolver, SlashCommandBuilder, TextChannel, Message, User } from 'discord.js';
+import { CommandInteraction, CommandInteractionOptionResolver, SlashCommandBuilder, TextChannel, Message, User, Client} from 'discord.js';
 import messages from '../data/messages.json';
 import taskCheck from '../embeds/task-check';
 import task from '../embeds/task';
@@ -64,19 +64,18 @@ export default {
     }
 };
 
-// リアクションの常時監視
-export const monitorReactions = (client: any) => {
-    client.on('messageReactionAdd', async (reaction: any, user: User) => {
-        // リアクションが追加されたメッセージがタスクメッセージか確認
-        if (reaction.emoji.name === '✅' && !user.bot) {
-            const taskMessage = reaction.message;
+export const monitorReactions = (client: Client) => {
+    client.on('messageReactionAdd', async (reaction, partialUser) => {
             
-            // ここでタスクメッセージのIDを比較するか、あるいは別の条件で判定
-            if (taskMessage.content.includes('Task assigned to')) {  // 例: メッセージの内容で判定
+        if (reaction.emoji.name === '✅' && !partialUser.bot) {
+            const taskMessage = await reaction.message.fetch();
+            const user = await partialUser.fetch();
+            
+            if (taskMessage.content.includes('Task assigned to')) {
                 const timestamp = new Date().toISOString();
+
                 console.log(`リアクションが追加されました。タイムスタンプ: ${timestamp}`);
                 
-                // スプレッドシートにタイムスタンプを記入
                 await writeToSheet(taskMessage.content, 'deadline_here', user.username, 'notes_here', timestamp);
             }
         }
