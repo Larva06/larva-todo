@@ -4,8 +4,8 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "ts-node src/main.ts",
-    "commands": "ts-node src/deploy-commands.ts",
+    "test": "tsx src/main.ts",
+    "commands": "tsx src/deploy-commands.ts",
     "start": "node dist/main.js",
     "build": "tsc",
     "format": "prettier ./src --write",
@@ -25,6 +25,6 @@
   "devDependencies": {
     "eslint": "^9.19.0",
     "prettier": "^3.5.2",
-    "ts-node": "^10.9.2"
+    "tsx": "^4.19.3"
   }
 }
