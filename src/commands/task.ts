@@ -1,10 +1,9 @@
-import { CommandInteraction, CommandInteractionOptionResolver, SlashCommandBuilder, TextChannel, Message, User, Client} from 'discord.js';
-import messages from '../data/messages.json';
-import taskCheck from '../embeds/task-check';
-import task from '../embeds/task';
-import format from '../format';
-import { writeToSheet } from '../sheets'; 
-import { CHANNEL_ID } from '../env';
+import { CommandInteraction, CommandInteractionOptionResolver, SlashCommandBuilder, TextChannel, Client} from 'discord.js';
+import messages from '../data/messages.json' with {type: 'json'};
+import taskCheck from '../embeds/task-check.js';
+import format from '../format.js';
+import { writeToSheet } from '../sheets.js'; 
+import { CHANNEL_ID } from '../env.js';
 
 export default {
     data: new SlashCommandBuilder()
@@ -36,7 +35,6 @@ export default {
         const notes = options.getString("notes") || 'なし';
 
         const taskCheckEmbed = taskCheck(taskContent, deadLine, notes);
-        const taskEmbed = task(interaction.user.username, taskContent, deadLine, notes);
 
         // 依頼主に確認で送る用
         const reply = await interaction.reply({
@@ -50,12 +48,7 @@ export default {
         // 依頼された人に送る用
         const channel = await interaction.client.channels.fetch(CHANNEL_ID());
         
-        if (channel instanceof TextChannel) { 
-            const taskMessage = await channel.send({
-                content: format(messages.guild.task.title, user.id),
-                embeds: [taskEmbed]
-            });
-
+        if (channel instanceof TextChannel) {
             // リアクションを追加
             await reply.react('✅');
         } else {

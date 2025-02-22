@@ -1,8 +1,8 @@
 // sheets.ts 
 
 import { google } from 'googleapis';
-import messages from './data/messages.json';
-import { GOOGLE_SERVICE_ACCOUNT_EMAIL, GOOGLE_PRIVATE_KEY, SPREADSHEET_ID, SHEET_NAME } from './env';
+import messages from './data/messages.json' with {type: 'json'};
+import { GOOGLE_SERVICE_ACCOUNT_EMAIL, GOOGLE_PRIVATE_KEY, SPREADSHEET_ID, SHEET_NAME } from './env.js';
 
 const SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
 const auth = new google.auth.JWT(

@@ -1,14 +1,10 @@
 // main.ts
 
-import { GatewayIntentBits, Client, REST, Routes, Events, Partials } from 'discord.js';
-import { google } from 'googleapis';
-import { TOKEN } from './env';
-import format from './format';
-import messages from './data/messages.json';
-import taskEmbed from './embeds/task';
+import { GatewayIntentBits, Client, Partials } from 'discord.js';
+import { TOKEN } from './env.js';
 
 // Slash command
-import task, { monitorReactions } from './commands/task';
+import task, { monitorReactions } from './commands/task.js';
 
 
 const client = new Client({
