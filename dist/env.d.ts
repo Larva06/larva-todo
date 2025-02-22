@@ -1,0 +1,10 @@
+export declare function TOKEN(): string;
+export declare function APPLICATION_ID(): string;
+export declare function GUILD_ID(): string;
+export declare function CHANNEL_ID(): string;
+export declare function GOOGLE_CLIENT_ID(): string;
+export declare function GOOGLE_CLIENT_SECRET(): string;
+export declare function GOOGLE_SERVICE_ACCOUNT_EMAIL(): string;
+export declare function GOOGLE_PRIVATE_KEY(): string;
+export declare function SPREADSHEET_ID(): string;
+export declare function SHEET_NAME(): string;

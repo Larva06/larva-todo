@@ -1,7 +1,7 @@
 // embeds/task-check.ts 依頼した人に送る埋め込み
 
 import { EmbedBuilder } from 'discord.js';
-import messages from '../data/messages.json';
+import messages from '../data/messages.json' with {type: 'json'};
 
 export default function createTaskCheckEmbed(
     taskContent: string,
