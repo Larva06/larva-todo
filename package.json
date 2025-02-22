@@ -2,6 +2,7 @@
   "name": "larva-todo",
   "version": "1.0.0",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "test": "ts-node src/main.ts",
     "commands": "ts-node src/deploy-commands.ts",
