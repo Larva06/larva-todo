@@ -7,7 +7,7 @@
     "test": "ts-node src/main.ts",
     "commands": "ts-node src/deploy-commands.ts",
     "start": "node dist/main.js",
-    "compile": "tsc -p .",
+    "build": "tsc -p .",
     "format": "prettier ./src --write"
   },
   "keywords": [],
