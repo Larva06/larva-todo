@@ -1,13 +1,9 @@
 // embeds/task-check.ts 依頼した人に送る埋め込み
 
-import { EmbedBuilder } from 'discord.js';
-import messages from '../data/messages.json' with {type: 'json'};
+import { EmbedBuilder } from "discord.js";
+import messages from "../data/messages.json" with { type: "json" };
 
-export default function createTaskCheckEmbed(
-    taskContent: string,
-    deadLine: string,
-    notes: string
-) {
+export default function createTaskCheckEmbed(taskContent: string, deadLine: string, notes: string) {
     return new EmbedBuilder()
         .setAuthor({
             name: messages.common.embeds.author_name,
@@ -28,7 +24,7 @@ export default function createTaskCheckEmbed(
             value: notes,
             inline: false
         })
-        .setColor('#EA64A9')
+        .setColor("#EA64A9")
         .setFooter({
             text: messages.common.embeds.footer_text
         });

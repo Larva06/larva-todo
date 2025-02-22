@@ -8,7 +8,7 @@
     "commands": "ts-node src/deploy-commands.ts",
     "start": "node dist/main.js",
     "compile": "tsc -p .",
-    "format": "prettier . --write"
+    "format": "prettier ./src --write"
   },
   "keywords": [],
   "author": "",
