@@ -4,11 +4,11 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-export function TOKEN(): string {
-    if (process.env["TOKEN"]) {
-        return process.env["TOKEN"];
+export function DISCORD_TOKEN(): string {
+    if (process.env["DISCORD_TOKEN"]) {
+        return process.env["DISCORD_TOKEN"];
     } else {
-        throw new Error("TOKEN is undefined.");
+        throw new Error("DISCORD_TOKEN is undefined.");
     }
 }
 

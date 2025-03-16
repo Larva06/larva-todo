@@ -1,7 +1,7 @@
 // main.ts
 
 import { GatewayIntentBits, Client, Partials, Events, TextChannel } from "discord.js";
-import { CHANNEL_ID, TOKEN } from "./env.js";
+import { CHANNEL_ID, DISCORD_TOKEN } from "./env.js";
 
 // Slash command
 import task, { monitorReactions } from "./commands/task.js";
@@ -36,4 +36,4 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
 monitorReactions(client);
 
-client.login(TOKEN());
+client.login(DISCORD_TOKEN());
