@@ -74,7 +74,7 @@ export const monitorReactions = (client: Client) => {
             const taskMessage = await reaction.message.fetch();
             const user = await partialUser.fetch();
 
-            if (taskMessage.content.includes("Task assigned to")) {
+            if (taskMessage.content.includes("下記の内容で依頼を送信します！")) {
                 const timestamp = new Date().toISOString();
 
                 console.log(`リアクションが追加されました。タイムスタンプ: ${timestamp}`);
