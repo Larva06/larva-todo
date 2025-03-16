@@ -57,7 +57,7 @@ export default {
             fetchReply: true
         });
 
-        await writeToSheet(taskId, taskContent, deadLine, user.username, notes);
+        await writeToSheet(taskId, taskContent, deadLine, `${user.displayName} (@${user.username})`, notes);
 
         // 依頼された人に送る用
         const channel = await interaction.client.channels.fetch(CHANNEL_ID());
