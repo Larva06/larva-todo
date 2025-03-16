@@ -1,14 +1,20 @@
 // embeds/task-check.ts 依頼した人に送る埋め込み
 
-import { EmbedBuilder } from "discord.js";
+import { EmbedBuilder, User } from "discord.js";
 import messages from "../data/messages.json" with { type: "json" };
 import { THEME_COLOR } from "../env.js";
 
-export default function createTaskCheckEmbed(taskId: string, taskContent: string, deadLine: string, notes: string) {
+export default function createTaskCheckEmbed(
+    taskId: string,
+    taskContent: string,
+    deadLine: string,
+    notes: string,
+    requester: User
+) {
     return new EmbedBuilder()
         .setAuthor({
-            name: messages.common.embeds.author_name,
-            iconURL: messages.common.embeds.author_icon
+            name: requester.displayName,
+            iconURL: requester.displayAvatarURL()
         })
         .addFields({
             name: messages.guild.taskCheck.embeds.field1_name,
