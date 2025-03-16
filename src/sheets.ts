@@ -33,7 +33,7 @@ export async function writeToSheet(taskId: string, taskContent: string, deadLine
     }
 }
 
-export async function updateTaskCompletion(taskId: string, completedAt: string) {
+async function updateTask(taskId: string, values: [string, string], action: string) {
     const spreadsheetId = SPREADSHEET_ID()!;
     const sheetName = SHEET_NAME()!;
 
@@ -59,13 +59,19 @@ export async function updateTaskCompletion(taskId: string, completedAt: string) 
             spreadsheetId,
             range: `${sheetName}!F${rowIndex}:G${rowIndex}`,
             valueInputOption: "USER_ENTERED",
-            requestBody: {
-                values: [["true", completedAt]]
-            }
+            requestBody: { values: [values] }
         });
 
-        console.log(`タスク（${taskId}）を${completedAt}に完了としてマークしました。`);
+        console.log(`タスク（${taskId}）を${action}しました。`);
     } catch (error) {
-        console.error("タスクを完了に更新する際にエラーが発生しました：", error);
+        console.error(`タスクの${action}中にエラーが発生しました：`, error);
     }
+}
+
+export async function updateTaskCompletion(taskId: string, completedAt: string) {
+    return updateTask(taskId, ["true", completedAt], "完了に更新");
+}
+
+export async function resetTaskCompletion(taskId: string) {
+    return updateTask(taskId, ["false", ""], "未完了状態にリセット");
 }

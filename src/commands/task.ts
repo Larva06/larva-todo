@@ -3,12 +3,13 @@ import {
     CommandInteractionOptionResolver,
     SlashCommandBuilder,
     TextChannel,
-    Client
+    Client,
+    Events
 } from "discord.js";
 import messages from "../data/messages.json" with { type: "json" };
 import taskCheck from "../embeds/task-check.js";
 import format from "../format.js";
-import { writeToSheet, updateTaskCompletion } from "../sheets.js";
+import { writeToSheet, updateTaskCompletion, resetTaskCompletion } from "../sheets.js";
 import { randomUUID } from "crypto";
 import { CHANNEL_ID } from "../env.js";
 
@@ -71,7 +72,7 @@ export default {
 };
 
 export const monitorReactions = (client: Client) => {
-    client.on("messageReactionAdd", async (reaction, partialUser) => {
+    client.on(Events.MessageReactionAdd, async (reaction, partialUser) => {
         if (reaction.emoji.name === "✅" && !partialUser.bot) {
             const taskMessage = await reaction.message.fetch();
 
@@ -83,6 +84,35 @@ export const monitorReactions = (client: Client) => {
                     const timestamp = new Date().toISOString();
                     console.log(`リアクションが追加されました。タスクID: ${taskId}, タイムスタンプ: ${timestamp}`);
                     await updateTaskCompletion(taskId, timestamp);
+                }
+            }
+        }
+    });
+
+    client.on(Events.MessageReactionRemove, async (reaction, partialUser) => {
+        if (reaction.partial) {
+            try {
+                await reaction.fetch();
+            } catch (error) {
+                console.error("リアクションの情報取得に失敗しました:", error);
+                return;
+            }
+        }
+        // ここでリアクション削除後の処理を実施
+        console.log(
+            `User ${partialUser.tag} removed reaction ${reaction.emoji.name} from message ${reaction.message.id}`
+        );
+
+        if (reaction.emoji.name === "✅" && !partialUser.bot) {
+            const taskMessage = await reaction.message.fetch();
+
+            if (taskMessage.content.includes("下記の内容で依頼を送信します！")) {
+                const description = taskMessage.embeds[0]?.description;
+                const taskId = description?.match(/taskId: ([^]+)/)?.[1];
+
+                if (taskId) {
+                    console.log(`リアクションが削除されました。タスクID: ${taskId}`);
+                    await resetTaskCompletion(taskId);
                 }
             }
         }
