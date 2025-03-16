@@ -14,27 +14,58 @@ const auth = new google.auth.JWT(
 
 const sheets = google.sheets({ version: "v4", auth });
 
-export async function writeToSheet(
-    taskContent: string,
-    deadLine: string,
-    user: string,
-    notes: string,
-    timestamp?: string
-) {
+export async function writeToSheet(taskId: string, taskContent: string, deadLine: string, user: string, notes: string) {
     const spreadsheetId = SPREADSHEET_ID()!;
     const sheetName = SHEET_NAME()!;
 
     try {
         await sheets.spreadsheets.values.append({
             spreadsheetId,
-            range: `${sheetName}!A:E`,
+            range: `${sheetName}!A:G`,
             valueInputOption: "USER_ENTERED",
             requestBody: {
-                values: [[taskContent, deadLine, user, notes, timestamp]]
+                values: [[taskId, taskContent, deadLine, user, notes, "false", ""]]
             }
         });
         console.log(messages.log.spreadSuc);
     } catch (error) {
         console.error(messages.log.spreadFail, error);
+    }
+}
+
+export async function updateTaskCompletion(taskId: string, completedAt: string) {
+    const spreadsheetId = SPREADSHEET_ID()!;
+    const sheetName = SHEET_NAME()!;
+
+    try {
+        const response = await sheets.spreadsheets.values.get({
+            spreadsheetId,
+            range: `${sheetName}!A:A`
+        });
+
+        const rows = response.data.values;
+        if (!rows) {
+            console.error("スプレッドシートにデータが見つかりませんでした。");
+            return;
+        }
+
+        const rowIndex = rows.findIndex((row) => row[0] === taskId) + 1;
+        if (rowIndex === 0) {
+            console.error(`タスク（${taskId}）が見つかりませんでした。`);
+            return;
+        }
+
+        await sheets.spreadsheets.values.update({
+            spreadsheetId,
+            range: `${sheetName}!F${rowIndex}:G${rowIndex}`,
+            valueInputOption: "USER_ENTERED",
+            requestBody: {
+                values: [["true", completedAt]]
+            }
+        });
+
+        console.log(`タスク（${taskId}）を${completedAt}に完了としてマークしました。`);
+    } catch (error) {
+        console.error("タスクを完了に更新する際にエラーが発生しました：", error);
     }
 }
