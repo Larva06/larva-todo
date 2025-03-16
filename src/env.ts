@@ -76,3 +76,11 @@ export function THEME_COLOR(): ColorResolvable {
         throw new Error("THEME_COLOR is undefined.");
     }
 }
+
+export function TIMEZONE_OFFSET(): string {
+    if (process.env["TIMEZONE_OFFSET"]) {
+        return process.env["TIMEZONE_OFFSET"];
+    } else {
+        throw new Error("TIMEZONE_OFFSET is undefined.");
+    }
+}

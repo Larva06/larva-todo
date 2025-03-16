@@ -11,7 +11,7 @@ import taskCheck from "../embeds/task-check.js";
 import format from "../format.js";
 import { writeToSheet, updateTaskCompletion, resetTaskCompletion } from "../sheets.js";
 import { randomUUID } from "crypto";
-import { CHANNEL_ID } from "../env.js";
+import { CHANNEL_ID, TIMEZONE_OFFSET } from "../env.js";
 
 export default {
     data: new SlashCommandBuilder()
@@ -44,7 +44,9 @@ export default {
 
         const taskId = randomUUID();
         const taskContent = options.getString("task-content", true);
-        const deadLine = options.getString("dead-line", true);
+        const rawDeadLine = options.getString("dead-line", true); // "2025/03/17"
+        const isoDate = rawDeadLine.replace(/\//g, "-"); // "2025-03-17"
+        const deadLine = `${isoDate}T23:59:59${TIMEZONE_OFFSET()}`; // "2025-03-17T23:59:59+09:00"
         const user = options.getUser("user", true);
         const notes = options.getString("notes") || "なし";
 

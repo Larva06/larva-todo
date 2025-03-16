@@ -75,3 +75,35 @@ export async function updateTaskCompletion(taskId: string, completedAt: string) 
 export async function resetTaskCompletion(taskId: string) {
     return updateTask(taskId, ["false", ""], "未完了状態にリセット");
 }
+
+export async function getUncompletedTasks() {
+    const spreadsheetId = SPREADSHEET_ID()!;
+    const sheetName = SHEET_NAME()!;
+
+    try {
+        const response = await sheets.spreadsheets.values.get({
+            spreadsheetId,
+            range: `${sheetName}!A:F`
+        });
+
+        const rows = response.data.values;
+        if (!rows) {
+            console.error("スプレッドシートにデータが見つかりませんでした。");
+            return [];
+        }
+
+        // Skip header row and filter uncompleted tasks
+        return rows
+            .slice(1)
+            .filter((row) => row[5] === "false") // F列（completed）が false のもの
+            .map((row) => ({
+                taskId: row[0],
+                taskContent: row[1],
+                deadline: row[2],
+                user: row[3]
+            }));
+    } catch (error) {
+        console.error("未完了タスクの取得中にエラーが発生しました：", error);
+        return [];
+    }
+}
