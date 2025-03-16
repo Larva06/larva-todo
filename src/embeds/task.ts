@@ -2,6 +2,7 @@
 
 import { EmbedBuilder } from "discord.js";
 import messages from "../data/messages.json" with { type: "json" };
+import { THEME_COLOR } from "../env.js";
 
 export default function createTaskCheckEmbed(requester: string, taskContent: string, deadline: string, notes: string) {
     return new EmbedBuilder()
@@ -29,7 +30,7 @@ export default function createTaskCheckEmbed(requester: string, taskContent: str
             value: notes,
             inline: false
         })
-        .setColor("#EA64A9")
+        .setColor(THEME_COLOR())
         .setFooter({
             text: messages.common.embeds.footer_text
         });
