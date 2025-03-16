@@ -36,22 +36,6 @@ export function CHANNEL_ID(): string {
     }
 }
 
-export function GOOGLE_CLIENT_ID(): string {
-    if (process.env["GOOGLE_CLIENT_ID"]) {
-        return process.env["GOOGLE_CLIENT_ID"];
-    } else {
-        throw new Error("GOOGLE_CLIENT_ID is undefined.");
-    }
-}
-
-export function GOOGLE_CLIENT_SECRET(): string {
-    if (process.env["GOOGLE_CLIENT_SECRET"]) {
-        return process.env["GOOGLE_CLIENT_SECRET"];
-    } else {
-        throw new Error("GOOGLE_CLIENT_SECRET is undefined.");
-    }
-}
-
 export function GOOGLE_SERVICE_ACCOUNT_EMAIL(): string {
     if (process.env["GOOGLE_SERVICE_ACCOUNT_EMAIL"]) {
         return process.env["GOOGLE_SERVICE_ACCOUNT_EMAIL"];
