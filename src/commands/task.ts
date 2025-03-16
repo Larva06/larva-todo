@@ -52,7 +52,7 @@ export default {
 
         // 依頼主に確認で送る用
         const reply = await interaction.reply({
-            content: format(messages.guild.taskCheck.title, user.username),
+            content: format(messages.guild.taskCheck.title, user.toString()),
             embeds: [taskCheckEmbed],
             fetchReply: true
         });
