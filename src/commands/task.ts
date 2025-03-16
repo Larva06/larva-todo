@@ -8,7 +8,8 @@ import {
 import messages from "../data/messages.json" with { type: "json" };
 import taskCheck from "../embeds/task-check.js";
 import format from "../format.js";
-import { writeToSheet } from "../sheets.js";
+import { writeToSheet, updateTaskCompletion } from "../sheets.js";
+import { randomUUID } from "crypto";
 import { CHANNEL_ID } from "../env.js";
 
 export default {
@@ -40,12 +41,13 @@ export default {
     execute: async function (interaction: CommandInteraction) {
         const options = interaction.options as CommandInteractionOptionResolver;
 
+        const taskId = randomUUID();
         const taskContent = options.getString("task-content", true);
         const deadLine = options.getString("dead-line", true);
         const user = options.getUser("user", true);
         const notes = options.getString("notes") || "なし";
 
-        const taskCheckEmbed = taskCheck(taskContent, deadLine, notes);
+        const taskCheckEmbed = taskCheck(taskId, taskContent, deadLine, notes);
 
         // 依頼主に確認で送る用
         const reply = await interaction.reply({
@@ -54,7 +56,7 @@ export default {
             fetchReply: true
         });
 
-        await writeToSheet(taskContent, deadLine, user.username, notes);
+        await writeToSheet(taskId, taskContent, deadLine, user.username, notes);
 
         // 依頼された人に送る用
         const channel = await interaction.client.channels.fetch(CHANNEL_ID());
@@ -72,14 +74,16 @@ export const monitorReactions = (client: Client) => {
     client.on("messageReactionAdd", async (reaction, partialUser) => {
         if (reaction.emoji.name === "✅" && !partialUser.bot) {
             const taskMessage = await reaction.message.fetch();
-            const user = await partialUser.fetch();
 
             if (taskMessage.content.includes("下記の内容で依頼を送信します！")) {
-                const timestamp = new Date().toISOString();
+                const description = taskMessage.embeds[0]?.description;
+                const taskId = description?.match(/taskId: ([^]+)/)?.[1];
 
-                console.log(`リアクションが追加されました。タイムスタンプ: ${timestamp}`);
-
-                await writeToSheet(taskMessage.content, "deadline_here", user.username, "notes_here", timestamp);
+                if (taskId) {
+                    const timestamp = new Date().toISOString();
+                    console.log(`リアクションが追加されました。タスクID: ${taskId}, タイムスタンプ: ${timestamp}`);
+                    await updateTaskCompletion(taskId, timestamp);
+                }
             }
         }
     });

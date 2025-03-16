@@ -3,7 +3,7 @@
 import { EmbedBuilder } from "discord.js";
 import messages from "../data/messages.json" with { type: "json" };
 
-export default function createTaskCheckEmbed(taskContent: string, deadLine: string, notes: string) {
+export default function createTaskCheckEmbed(taskId: string, taskContent: string, deadLine: string, notes: string) {
     return new EmbedBuilder()
         .setAuthor({
             name: messages.common.embeds.author_name,
@@ -27,5 +27,6 @@ export default function createTaskCheckEmbed(taskContent: string, deadLine: stri
         .setColor("#EA64A9")
         .setFooter({
             text: messages.common.embeds.footer_text
-        });
+        })
+        .setDescription(`taskId: ${taskId}`);
 }
