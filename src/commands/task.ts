@@ -48,7 +48,7 @@ export default {
         const user = options.getUser("user", true);
         const notes = options.getString("notes") || "なし";
 
-        const taskCheckEmbed = taskCheck(taskId, taskContent, deadLine, notes);
+        const taskCheckEmbed = taskCheck(taskId, taskContent, deadLine, notes, user);
 
         // 依頼主に確認で送る用
         const reply = await interaction.reply({
