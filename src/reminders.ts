@@ -26,7 +26,9 @@ async function sendReminder(client: Client, user: string, taskContent: string, d
     const channel = await client.channels.fetch(CHANNEL_ID());
 
     if (channel instanceof TextChannel) {
-        const message = format(messages.guild.task.reTitle, `<@${user}>`);
+        // `表示名 (@ユーザーID)`の形式からユーザーIDを抽出
+        const username = user.match(/.*\(@([^)]+)\)\s*$/)?.[1] || "";
+        const message = format(messages.guild.task.reTitle, `<@${username}>`);
         await channel.send({
             content: message,
             embeds: [
