@@ -98,10 +98,6 @@ export const monitorReactions = (client: Client) => {
                 return;
             }
         }
-        // ここでリアクション削除後の処理を実施
-        console.log(
-            `User ${partialUser.tag} removed reaction ${reaction.emoji.name} from message ${reaction.message.id}`
-        );
 
         if (reaction.emoji.name === "✅" && !partialUser.bot) {
             const taskMessage = await reaction.message.fetch();

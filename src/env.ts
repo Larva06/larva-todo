@@ -1,6 +1,7 @@
 // env.ts
 
 import dotenv from "dotenv";
+import type { ColorResolvable } from "discord.js";
 
 dotenv.config();
 
@@ -65,5 +66,13 @@ export function SHEET_NAME(): string {
         return process.env["SHEET_NAME"];
     } else {
         throw new Error("SHEET_NAME is undefined.");
+    }
+}
+
+export function THEME_COLOR(): ColorResolvable {
+    if (process.env["THEME_COLOR"]) {
+        return process.env["THEME_COLOR"] as ColorResolvable;
+    } else {
+        throw new Error("THEME_COLOR is undefined.");
     }
 }
