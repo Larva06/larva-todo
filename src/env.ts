@@ -1,5 +1,5 @@
-import dotenv from "dotenv";
 import type { ColorResolvable } from "discord.js";
+import dotenv from "dotenv";
 
 dotenv.config();
 

@@ -1,5 +1,5 @@
-import { GatewayIntentBits, Client, Partials, Events, TextChannel } from "discord.js";
 import { CHANNEL_ID, DISCORD_TOKEN } from "./env.js";
+import { Client, Events, GatewayIntentBits, Partials, TextChannel } from "discord.js";
 
 // Slash command
 import { monitorReactions, slashCommand } from "./commands/task.js";

@@ -1,7 +1,7 @@
 import { EmbedBuilder, User } from "discord.js";
-import messages from "../data/messages.json" with { type: "json" };
 import { THEME_COLOR } from "../env.js";
 import type { Task } from "../types/types.js";
+import messages from "../data/messages.json" with { type: "json" };
 
 const createTaskCheckEmbed = (options: Task): EmbedBuilder => {
     const baseEmbed = new EmbedBuilder()
