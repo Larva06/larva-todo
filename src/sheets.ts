@@ -2,6 +2,7 @@ import { GOOGLE_PRIVATE_KEY, GOOGLE_SERVICE_ACCOUNT_EMAIL, SHEET_NAME, SPREADSHE
 import type { Task } from "./types/types.js";
 import { google } from "googleapis";
 import messages from "./data/messages.json" with { type: "json" };
+import { logError, logInfo } from "./log.js";
 
 const SCOPES = ["https://www.googleapis.com/auth/spreadsheets"];
 const auth = new google.auth.JWT(
@@ -36,9 +37,9 @@ const writeToSheet = async (options: Task): Promise<void> => {
                 ]
             }
         });
-        console.log(messages.log.spreadSuc);
+        logInfo(messages.log.spreadSuc);
     } catch (error) {
-        console.error(messages.log.spreadFail, error);
+        logError(messages.log.spreadFail, error);
     }
 };
 
@@ -54,13 +55,13 @@ const updateTask = async (taskId: string, values: [string, string], action: stri
 
         const rows = response.data.values;
         if (!rows) {
-            console.error("スプレッドシートにデータが見つかりませんでした。");
+            logError("スプレッドシートにデータが見つかりませんでした。");
             return;
         }
 
         const rowIndex = rows.findIndex((row) => row[0] === taskId) + 1;
         if (rowIndex === 0) {
-            console.error(`タスク（${taskId}）が見つかりませんでした。`);
+            logError(`タスク（${taskId}）が見つかりませんでした。`);
             return;
         }
 
@@ -71,9 +72,9 @@ const updateTask = async (taskId: string, values: [string, string], action: stri
             requestBody: { values: [values] }
         });
 
-        console.log(`タスク（${taskId}）を${action}しました。`);
+        logInfo(`タスク（${taskId}）を${action}しました。`);
     } catch (error) {
-        console.error(`タスクの${action}中にエラーが発生しました：`, error);
+        logError(`タスクの${action}中にエラーが発生しました：`, error);
     }
 };
 
@@ -97,7 +98,7 @@ const getUncompletedTasks = async (): Promise<Array<Task & { assignee: string }>
 
         const rows = response.data.values;
         if (!rows) {
-            console.error("スプレッドシートにデータが見つかりませんでした。");
+            logError("スプレッドシートにデータが見つかりませんでした。");
             return [];
         }
 
@@ -111,7 +112,7 @@ const getUncompletedTasks = async (): Promise<Array<Task & { assignee: string }>
                 notes: row[4]
             }));
     } catch (error) {
-        console.error("未完了タスクの取得中にエラーが発生しました：", error);
+        logError("未完了タスクの取得中にエラーが発生しました：", error);
         return [];
     }
 };
