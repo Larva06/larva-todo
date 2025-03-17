@@ -11,7 +11,7 @@ import taskCheck from "../embeds/task-check.js";
 import format from "../format.js";
 import { writeToSheet, updateTaskCompletion, resetTaskCompletion } from "../sheets.js";
 import { randomUUID } from "crypto";
-import { CHANNEL_ID } from "../env.js";
+import { CHANNEL_ID, TIMEZONE_OFFSET } from "../env.js";
 
 export default {
     data: new SlashCommandBuilder()
@@ -44,20 +44,23 @@ export default {
 
         const taskId = randomUUID();
         const taskContent = options.getString("task-content", true);
-        const deadLine = options.getString("dead-line", true);
-        const user = options.getUser("user", true);
+        const rawDeadLine = options.getString("dead-line", true); // "2025/03/17"
+        const isoDate = rawDeadLine.replace(/\//g, "-"); // "2025-03-17"
+        const deadline = `${isoDate}T23:59:59${TIMEZONE_OFFSET()}`; // "2025-03-17T23:59:59+09:00"
+        const assignee = options.getUser("user", true);
         const notes = options.getString("notes") || "なし";
 
-        const taskCheckEmbed = taskCheck(taskId, taskContent, deadLine, notes, user);
+        const taskCheckEmbed = taskCheck({ taskId, taskContent, deadline, notes, assignee });
 
         // 依頼主に確認で送る用
         const reply = await interaction.reply({
-            content: format(messages.guild.taskCheck.title, user.toString()),
+            content: format(messages.guild.taskCheck.title, assignee.toString()),
             embeds: [taskCheckEmbed],
             fetchReply: true
         });
 
-        await writeToSheet(taskId, taskContent, deadLine, `${user.displayName} (@${user.username})`, notes);
+        // ユーザー名の記録方法を変更する場合は、`src/reminders.ts`の`sendReminder()`の正規表現も変更する必要がある
+        await writeToSheet(taskId, taskContent, deadline, `${assignee.displayName} (${assignee.id})`, notes);
 
         // 依頼された人に送る用
         const channel = await interaction.client.channels.fetch(CHANNEL_ID());

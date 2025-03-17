@@ -3,37 +3,35 @@
 import { EmbedBuilder, User } from "discord.js";
 import messages from "../data/messages.json" with { type: "json" };
 import { THEME_COLOR } from "../env.js";
+import type { Task } from "../types/types.js";
 
-export default function createTaskCheckEmbed(
-    taskId: string,
-    taskContent: string,
-    deadLine: string,
-    notes: string,
-    requester: User
-) {
-    return new EmbedBuilder()
-        .setAuthor({
-            name: requester.displayName,
-            iconURL: requester.displayAvatarURL()
-        })
+export default function createTaskCheckEmbed(options: Task) {
+    const baseEmbed = new EmbedBuilder()
         .addFields({
             name: messages.guild.taskCheck.embeds.field1_name,
-            value: taskContent,
+            value: options.taskContent,
             inline: false
         })
         .addFields({
             name: messages.guild.taskCheck.embeds.field2_name,
-            value: deadLine,
+            value: options.deadline,
             inline: false
         })
         .addFields({
             name: messages.guild.taskCheck.embeds.field3_name,
-            value: notes,
+            value: options.notes,
             inline: false
         })
         .setColor(THEME_COLOR())
         .setFooter({
             text: messages.common.embeds.footer_text
         })
-        .setDescription(`taskId: ${taskId}`);
+        .setDescription(`taskId: ${options.taskId}`);
+
+    return options.assignee instanceof User
+        ? baseEmbed.setAuthor({
+              name: options.assignee.displayName,
+              iconURL: options.assignee.displayAvatarURL()
+          })
+        : baseEmbed;
 }

@@ -3,6 +3,7 @@
 import { google } from "googleapis";
 import messages from "./data/messages.json" with { type: "json" };
 import { GOOGLE_SERVICE_ACCOUNT_EMAIL, GOOGLE_PRIVATE_KEY, SPREADSHEET_ID, SHEET_NAME } from "./env.js";
+import type { Task } from "./types/types.js";
 
 const SCOPES = ["https://www.googleapis.com/auth/spreadsheets"];
 const auth = new google.auth.JWT(
@@ -24,7 +25,7 @@ export async function writeToSheet(taskId: string, taskContent: string, deadLine
             range: `${sheetName}!A:G`,
             valueInputOption: "USER_ENTERED",
             requestBody: {
-                values: [[taskId, taskContent, deadLine, user, notes, "false", ""]]
+                values: [[taskId, taskContent, deadLine, user, notes, "FALSE", ""]]
             }
         });
         console.log(messages.log.spreadSuc);
@@ -69,9 +70,40 @@ async function updateTask(taskId: string, values: [string, string], action: stri
 }
 
 export async function updateTaskCompletion(taskId: string, completedAt: string) {
-    return updateTask(taskId, ["true", completedAt], "完了に更新");
+    return updateTask(taskId, ["TRUE", completedAt], "完了に更新");
 }
 
 export async function resetTaskCompletion(taskId: string) {
-    return updateTask(taskId, ["false", ""], "未完了状態にリセット");
+    return updateTask(taskId, ["FALSE", ""], "未完了状態にリセット");
+}
+
+export async function getUncompletedTasks(): Promise<Array<Task & { assignee: string }>> {
+    const spreadsheetId = SPREADSHEET_ID()!;
+    const sheetName = SHEET_NAME()!;
+
+    try {
+        const response = await sheets.spreadsheets.values.get({
+            spreadsheetId,
+            range: `${sheetName}!A:F`
+        });
+
+        const rows = response.data.values;
+        if (!rows) {
+            console.error("スプレッドシートにデータが見つかりませんでした。");
+            return [];
+        }
+
+        return rows
+            .filter((row) => row[5] === "FALSE") // F列（completed）が FALSE のもの
+            .map((row) => ({
+                taskId: row[0],
+                taskContent: row[1],
+                deadline: row[2],
+                assignee: row[3],
+                notes: row[4]
+            }));
+    } catch (error) {
+        console.error("未完了タスクの取得中にエラーが発生しました：", error);
+        return [];
+    }
 }

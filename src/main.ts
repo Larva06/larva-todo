@@ -5,6 +5,7 @@ import { CHANNEL_ID, DISCORD_TOKEN } from "./env.js";
 
 // Slash command
 import task, { monitorReactions } from "./commands/task.js";
+import { checkAndSendReminders } from "./reminders.js";
 
 const client = new Client({
     intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessageReactions],
@@ -23,6 +24,10 @@ client.once(Events.ClientReady, async () => {
         await channel.messages.fetch({ limit: 100 });
     }
     console.log("メッセージキャッシュを構築しました。");
+
+    // 1時間ごとにリマインダーをチェック
+    setInterval(() => checkAndSendReminders(client), 1000 * 60 * 60);
+    console.log("リマインダーチェックを開始しました。");
 });
 
 // slash command
