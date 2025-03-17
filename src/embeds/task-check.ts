@@ -8,19 +8,19 @@ const createTaskCheckEmbed = (options: Task): EmbedBuilder => {
         .setColor(THEME_COLOR)
         .setDescription(`taskId: ${options.taskId}`)
         .addFields({
+            inline: false,
             name: messages.guild.taskCheck.embeds.field1_name,
-            value: options.taskContent,
-            inline: false
+            value: options.taskContent
         })
         .addFields({
+            inline: false,
             name: messages.guild.taskCheck.embeds.field2_name,
-            value: options.deadline,
-            inline: false
+            value: options.deadline
         })
         .addFields({
+            inline: false,
             name: messages.guild.taskCheck.embeds.field3_name,
-            value: options.notes,
-            inline: false
+            value: options.notes
         })
         .setFooter({
             text: messages.common.embeds.footer_text
@@ -29,8 +29,8 @@ const createTaskCheckEmbed = (options: Task): EmbedBuilder => {
 
     return options.assignee instanceof User
         ? baseEmbed.setAuthor({
-              name: options.assignee.displayName,
-              iconURL: options.assignee.displayAvatarURL()
+              iconURL: options.assignee.displayAvatarURL(),
+              name: options.assignee.displayName
           })
         : baseEmbed;
 };

@@ -4,8 +4,12 @@ import {
     type CommandInteraction,
     type CommandInteractionOptionResolver,
     Events,
+    type MessageReaction,
+    type PartialMessageReaction,
+    type PartialUser,
     SlashCommandBuilder,
-    TextChannel
+    TextChannel,
+    type User
 } from "discord.js";
 import { logError, logInfo } from "../log.js";
 import { resetTaskCompletion, updateTaskCompletion, writeToSheet } from "../sheets.js";
@@ -40,18 +44,24 @@ const slashCommand = {
                 .setRequired(false)
         ),
 
+    // eslint-disable-next-line max-statements, max-lines-per-function
     execute: async (interaction: CommandInteraction): Promise<void> => {
         const options = interaction.options as CommandInteractionOptionResolver;
 
         const taskId = randomUUID();
         const taskContent = options.getString("task-content", true);
-        const rawDeadLine = options.getString("dead-line", true); // "2025/03/17"
-        const isoDate = rawDeadLine.replace(/\//g, "-"); // "2025-03-17"
-        const deadline = `${isoDate}T23:59:59${TIMEZONE_OFFSET}`; // "2025-03-17T23:59:59+09:00"
-        const assignee = options.getUser("user", true);
-        const notes = options.getString("notes") || "なし";
 
-        const taskCheckEmbed = createTaskCheckEmbed({ taskId, taskContent, deadline, notes, assignee });
+        // `2025/03/17`の形式
+        const rawDeadLine = options.getString("dead-line", true);
+
+        // タイムゾーン付きのISO 8601形式に変換
+        const isoDate = rawDeadLine.replace(/\//gu, "-");
+        const deadline = `${isoDate}T23:59:59${TIMEZONE_OFFSET}`;
+
+        const assignee = options.getUser("user", true);
+        const notes = options.getString("notes") ?? "なし";
+
+        const taskCheckEmbed = createTaskCheckEmbed({ assignee, deadline, notes, taskContent, taskId });
 
         // 依頼主に確認で送る用
         const interactionCallbackResponse = await interaction.reply({
@@ -62,11 +72,11 @@ const slashCommand = {
 
         // ユーザー名の記録方法を変更する場合は、`src/reminders.ts`の`sendReminder()`の正規表現も変更する必要がある
         await writeToSheet({
-            taskId,
-            taskContent,
-            deadline,
             assignee: `${assignee.displayName} (${assignee.id})`,
-            notes
+            deadline,
+            notes,
+            taskContent,
+            taskId
         });
 
         // 依頼された人に送る用
@@ -75,7 +85,7 @@ const slashCommand = {
         if (channel instanceof TextChannel) {
             const { resource } = interactionCallbackResponse;
 
-            if (!resource || !resource.message) {
+            if (!resource?.message) {
                 logError(messages.log.messageSendFail);
                 return;
             }
@@ -88,54 +98,63 @@ const slashCommand = {
     }
 };
 
-const monitorReactions = (client: Client): void => {
-    client.on(Events.MessageReactionAdd, async (reaction, partialUser) => {
-        if (reaction.emoji.name === "✅" && !partialUser.bot) {
-            const taskMessage = await reaction.message.fetch();
-
-            if (
-                taskMessage.content.includes("下記の内容で依頼を送信します！") ||
-                taskMessage.content.includes("締め切り日の24時間前です！")
-            ) {
-                const description = taskMessage.embeds[0]?.description;
-                const taskId = description?.match(/taskId: ([^]+)/)?.[1];
-
-                if (taskId) {
-                    const timestamp = new Date().toISOString();
-                    logInfo(`リアクションが追加されました。タスクID: ${taskId}, タイムスタンプ: ${timestamp}`);
-                    await updateTaskCompletion(taskId, timestamp);
-                }
-            }
+// eslint-disable-next-line max-statements
+const onReactionChange = async (
+    type: "added" | "removed",
+    reaction: MessageReaction | PartialMessageReaction,
+    user: User | PartialUser
+): Promise<void> => {
+    if (reaction.partial) {
+        try {
+            await reaction.fetch();
+        } catch (error) {
+            logError("リアクションの情報取得に失敗しました:", error);
+            return;
         }
-    });
+    }
 
-    client.on(Events.MessageReactionRemove, async (reaction, partialUser) => {
-        if (reaction.partial) {
-            try {
-                await reaction.fetch();
-            } catch (error) {
-                logError("リアクションの情報取得に失敗しました:", error);
+    if (user.partial) {
+        try {
+            await user.fetch();
+        } catch (error) {
+            logError("ユーザーの情報取得に失敗しました:", error);
+            return;
+        }
+    }
+
+    if (reaction.emoji.name === "✅" && !user.bot) {
+        const taskMessage = await reaction.message.fetch();
+
+        if (
+            taskMessage.content.includes("下記の内容で依頼を送信します！") ||
+            taskMessage.content.includes("締め切り日の24時間前です！")
+        ) {
+            const description = taskMessage.embeds[0]?.description;
+            const taskIdMatch = description?.match(/taskId: (?<taskId>[^]+)/u);
+            const taskId = taskIdMatch?.groups?.["taskId"];
+            if (!taskId) {
+                logError("メッセージからタスクIDを取得できませんでした。");
                 return;
             }
-        }
 
-        if (reaction.emoji.name === "✅" && !partialUser.bot) {
-            const taskMessage = await reaction.message.fetch();
-
-            if (
-                taskMessage.content.includes("下記の内容で依頼を送信します！") ||
-                taskMessage.content.includes("締め切り日の24時間前です！")
-            ) {
-                const description = taskMessage.embeds[0]?.description;
-                const taskId = description?.match(/taskId: ([^]+)/)?.[1];
-
-                if (taskId) {
-                    const timestamp = new Date().toISOString();
-                    logInfo(`リアクションが削除されました。タスクID: ${taskId}, タイムスタンプ: ${timestamp}`);
-                    await resetTaskCompletion(taskId);
-                }
+            if (type === "added") {
+                logInfo(`リアクションが追加されました。タスクID: ${taskId}`);
+                await updateTaskCompletion(taskId);
+            } else {
+                logInfo(`リアクションが削除されました。タスクID: ${taskId}`);
+                await resetTaskCompletion(taskId);
             }
         }
+    }
+};
+
+const monitorReactions = (client: Client): void => {
+    client.on(Events.MessageReactionAdd, (reaction, partialUser) => {
+        void onReactionChange("added", reaction, partialUser);
+    });
+
+    client.on(Events.MessageReactionRemove, (reaction, partialUser) => {
+        void onReactionChange("removed", reaction, partialUser);
     });
 };
 
