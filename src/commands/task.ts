@@ -53,10 +53,10 @@ export default {
         const taskCheckEmbed = taskCheck({ taskId, taskContent, deadline, notes, assignee });
 
         // 依頼主に確認で送る用
-        const reply = await interaction.reply({
+        const interactionCallbackResponse = await interaction.reply({
             content: format(messages.guild.taskCheck.title, assignee.toString()),
             embeds: [taskCheckEmbed],
-            fetchReply: true
+            withResponse: true
         });
 
         // ユーザー名の記録方法を変更する場合は、`src/reminders.ts`の`sendReminder()`の正規表現も変更する必要がある
@@ -66,8 +66,15 @@ export default {
         const channel = await interaction.client.channels.fetch(CHANNEL_ID());
 
         if (channel instanceof TextChannel) {
+            const { resource } = interactionCallbackResponse;
+
+            if (!resource || !resource.message) {
+                console.error(messages.log.messageSendFail);
+                return;
+            }
+
             // リアクションを追加
-            await reply.react("✅");
+            await resource.message.react("✅");
         } else {
             console.error(messages.log.messageSendFail);
         }
