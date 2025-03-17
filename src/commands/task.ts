@@ -60,7 +60,13 @@ export default {
         });
 
         // ユーザー名の記録方法を変更する場合は、`src/reminders.ts`の`sendReminder()`の正規表現も変更する必要がある
-        await writeToSheet(taskId, taskContent, deadline, `${assignee.displayName} (${assignee.id})`, notes);
+        await writeToSheet({
+            taskId,
+            taskContent,
+            deadline,
+            assignee: `${assignee.displayName} (${assignee.id})`,
+            notes
+        });
 
         // 依頼された人に送る用
         const channel = await interaction.client.channels.fetch(CHANNEL_ID());
