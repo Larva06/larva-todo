@@ -1,5 +1,3 @@
-// main.ts
-
 import { GatewayIntentBits, Client, Partials, Events, TextChannel } from "discord.js";
 import { CHANNEL_ID, DISCORD_TOKEN } from "./env.js";
 

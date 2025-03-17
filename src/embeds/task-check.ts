@@ -1,5 +1,3 @@
-// embeds/task-check.ts 依頼した人に送る埋め込み
-
 import { EmbedBuilder, User } from "discord.js";
 import messages from "../data/messages.json" with { type: "json" };
 import { THEME_COLOR } from "../env.js";
