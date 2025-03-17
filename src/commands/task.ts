@@ -7,12 +7,12 @@ import {
     SlashCommandBuilder,
     TextChannel
 } from "discord.js";
+import { logError, logInfo } from "../log.js";
 import { resetTaskCompletion, updateTaskCompletion, writeToSheet } from "../sheets.js";
 import { createTaskCheckEmbed } from "../embeds/task-check.js";
 import { format } from "../format.js";
 import messages from "../data/messages.json" with { type: "json" };
 import { randomUUID } from "crypto";
-import { logError, logInfo } from "../log.js";
 
 const slashCommand = {
     data: new SlashCommandBuilder()

@@ -1,8 +1,8 @@
 import { GOOGLE_PRIVATE_KEY, GOOGLE_SERVICE_ACCOUNT_EMAIL, SHEET_NAME, SPREADSHEET_ID } from "./env.js";
+import { logError, logInfo } from "./log.js";
 import type { Task } from "./types/types.js";
 import { google } from "googleapis";
 import messages from "./data/messages.json" with { type: "json" };
-import { logError, logInfo } from "./log.js";
 
 const SCOPES = ["https://www.googleapis.com/auth/spreadsheets"];
 const auth = new google.auth.JWT(
