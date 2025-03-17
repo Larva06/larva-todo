@@ -7,6 +7,8 @@ import type { Task } from "../types/types.js";
 
 export default function createTaskCheckEmbed(options: Task) {
     const baseEmbed = new EmbedBuilder()
+        .setColor(THEME_COLOR())
+        .setDescription(`taskId: ${options.taskId}`)
         .addFields({
             name: messages.guild.taskCheck.embeds.field1_name,
             value: options.taskContent,
@@ -22,11 +24,10 @@ export default function createTaskCheckEmbed(options: Task) {
             value: options.notes,
             inline: false
         })
-        .setColor(THEME_COLOR())
         .setFooter({
             text: messages.common.embeds.footer_text
         })
-        .setDescription(`taskId: ${options.taskId}`);
+        .setTimestamp();
 
     return options.assignee instanceof User
         ? baseEmbed.setAuthor({

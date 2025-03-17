@@ -27,7 +27,6 @@ client.once(Events.ClientReady, async () => {
 
     // 1時間ごとにリマインダーをチェック
     setInterval(() => checkAndSendReminders(client), 1000 * 60 * 60);
-    console.log("リマインダーチェックを開始しました。");
 });
 
 // slash command
