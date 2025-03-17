@@ -5,7 +5,7 @@ import messages from "../data/messages.json" with { type: "json" };
 
 const createTaskCheckEmbed = (options: Task): EmbedBuilder => {
     const baseEmbed = new EmbedBuilder()
-        .setColor(THEME_COLOR())
+        .setColor(THEME_COLOR)
         .setDescription(`taskId: ${options.taskId}`)
         .addFields({
             name: messages.guild.taskCheck.embeds.field1_name,

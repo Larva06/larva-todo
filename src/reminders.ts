@@ -26,7 +26,7 @@ const checkAndSendReminders = async (client: Client): Promise<void> => {
 };
 
 const sendReminder = async (client: Client, task: Task & { assignee: string }): Promise<void> => {
-    const channel = await client.channels.fetch(CHANNEL_ID());
+    const channel = await client.channels.fetch(CHANNEL_ID);
 
     if (channel instanceof TextChannel) {
         // `表示名 (ユーザーID)`の形式からユーザーIDを抽出

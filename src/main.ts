@@ -16,7 +16,7 @@ client.once(Events.ClientReady, async (): Promise<void> => {
     }
 
     // ボットの再起動前に送信されたメッセージへのリアクションの追加・削除に反応するためにメッセージをキャッシュする
-    const channel = await client.channels.fetch(CHANNEL_ID());
+    const channel = await client.channels.fetch(CHANNEL_ID);
     if (channel instanceof TextChannel) {
         await channel.messages.fetch({ limit: 100 });
     }
@@ -37,4 +37,4 @@ client.on(Events.InteractionCreate, async (interaction): Promise<void> => {
 
 monitorReactions(client);
 
-client.login(DISCORD_TOKEN());
+client.login(DISCORD_TOKEN);

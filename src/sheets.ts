@@ -6,17 +6,17 @@ import messages from "./data/messages.json" with { type: "json" };
 
 const SCOPES = ["https://www.googleapis.com/auth/spreadsheets"];
 const auth = new google.auth.JWT(
-    GOOGLE_SERVICE_ACCOUNT_EMAIL(),
+    GOOGLE_SERVICE_ACCOUNT_EMAIL,
     undefined,
-    GOOGLE_PRIVATE_KEY()?.replace(/\\n/g, "\n"),
+    GOOGLE_PRIVATE_KEY.replace(/\\n/g, "\n"),
     SCOPES
 );
 
 const sheets = google.sheets({ version: "v4", auth });
 
 const writeToSheet = async (options: Task): Promise<void> => {
-    const spreadsheetId = SPREADSHEET_ID()!;
-    const sheetName = SHEET_NAME()!;
+    const spreadsheetId = SPREADSHEET_ID;
+    const sheetName = SHEET_NAME;
 
     try {
         await sheets.spreadsheets.values.append({
@@ -44,8 +44,8 @@ const writeToSheet = async (options: Task): Promise<void> => {
 };
 
 const updateTask = async (taskId: string, values: [string, string], action: string): Promise<void> => {
-    const spreadsheetId = SPREADSHEET_ID()!;
-    const sheetName = SHEET_NAME()!;
+    const spreadsheetId = SPREADSHEET_ID;
+    const sheetName = SHEET_NAME;
 
     try {
         const response = await sheets.spreadsheets.values.get({
@@ -87,8 +87,8 @@ const resetTaskCompletion = async (taskId: string): Promise<void> => {
 };
 
 const getUncompletedTasks = async (): Promise<Array<Task & { assignee: string }>> => {
-    const spreadsheetId = SPREADSHEET_ID()!;
-    const sheetName = SHEET_NAME()!;
+    const spreadsheetId = SPREADSHEET_ID;
+    const sheetName = SHEET_NAME;
 
     try {
         const response = await sheets.spreadsheets.values.get({
