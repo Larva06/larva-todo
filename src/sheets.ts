@@ -15,7 +15,7 @@ const auth = new google.auth.JWT(
 
 const sheets = google.sheets({ version: "v4", auth });
 
-export async function writeToSheet(taskId: string, taskContent: string, deadLine: string, user: string, notes: string) {
+export async function writeToSheet(options: Task) {
     const spreadsheetId = SPREADSHEET_ID()!;
     const sheetName = SHEET_NAME()!;
 
@@ -25,7 +25,17 @@ export async function writeToSheet(taskId: string, taskContent: string, deadLine
             range: `${sheetName}!A:G`,
             valueInputOption: "USER_ENTERED",
             requestBody: {
-                values: [[taskId, taskContent, deadLine, user, notes, "FALSE", ""]]
+                values: [
+                    [
+                        options.taskId,
+                        options.taskContent,
+                        options.deadline,
+                        options.assignee,
+                        options.notes,
+                        "FALSE",
+                        ""
+                    ]
+                ]
             }
         });
         console.log(messages.log.spreadSuc);
