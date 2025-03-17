@@ -12,6 +12,7 @@ import { createTaskCheckEmbed } from "../embeds/task-check.js";
 import { format } from "../format.js";
 import messages from "../data/messages.json" with { type: "json" };
 import { randomUUID } from "crypto";
+import { logError, logInfo } from "../log.js";
 
 const slashCommand = {
     data: new SlashCommandBuilder()
@@ -75,14 +76,14 @@ const slashCommand = {
             const { resource } = interactionCallbackResponse;
 
             if (!resource || !resource.message) {
-                console.error(messages.log.messageSendFail);
+                logError(messages.log.messageSendFail);
                 return;
             }
 
             // リアクションを追加
             await resource.message.react("✅");
         } else {
-            console.error(messages.log.messageSendFail);
+            logError(messages.log.messageSendFail);
         }
     }
 };
@@ -101,7 +102,7 @@ const monitorReactions = (client: Client): void => {
 
                 if (taskId) {
                     const timestamp = new Date().toISOString();
-                    console.log(`リアクションが追加されました。タスクID: ${taskId}, タイムスタンプ: ${timestamp}`);
+                    logInfo(`リアクションが追加されました。タスクID: ${taskId}, タイムスタンプ: ${timestamp}`);
                     await updateTaskCompletion(taskId, timestamp);
                 }
             }
@@ -113,7 +114,7 @@ const monitorReactions = (client: Client): void => {
             try {
                 await reaction.fetch();
             } catch (error) {
-                console.error("リアクションの情報取得に失敗しました:", error);
+                logError("リアクションの情報取得に失敗しました:", error);
                 return;
             }
         }
@@ -130,7 +131,7 @@ const monitorReactions = (client: Client): void => {
 
                 if (taskId) {
                     const timestamp = new Date().toISOString();
-                    console.log(`リアクションが削除されました。タスクID: ${taskId}, タイムスタンプ: ${timestamp}`);
+                    logInfo(`リアクションが削除されました。タスクID: ${taskId}, タイムスタンプ: ${timestamp}`);
                     await resetTaskCompletion(taskId);
                 }
             }

@@ -4,6 +4,7 @@ import { Client, Events, GatewayIntentBits, Partials, TextChannel } from "discor
 // Slash command
 import { monitorReactions, slashCommand } from "./commands/task.js";
 import { checkAndSendReminders } from "./reminders.js";
+import { logInfo } from "./log.js";
 
 const client = new Client({
     intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessageReactions],
@@ -11,9 +12,9 @@ const client = new Client({
 });
 
 client.once(Events.ClientReady, async (): Promise<void> => {
-    console.log("Ready!");
+    logInfo("Ready!");
     if (client.user) {
-        console.log(client.user.tag);
+        logInfo(client.user.tag);
     }
 
     // ボットの再起動前に送信されたメッセージへのリアクションの追加・削除に反応するためにメッセージをキャッシュする
@@ -21,7 +22,7 @@ client.once(Events.ClientReady, async (): Promise<void> => {
     if (channel instanceof TextChannel) {
         await channel.messages.fetch({ limit: 100 });
     }
-    console.log("メッセージキャッシュを構築しました。");
+    logInfo("メッセージキャッシュを構築しました。");
 
     // 1時間ごとにリマインダーをチェック
     setInterval(() => checkAndSendReminders(client), 1000 * 60 * 60);
