@@ -5,7 +5,7 @@ import messages from "../data/messages.json" with { type: "json" };
 import { THEME_COLOR } from "../env.js";
 import type { Task } from "../types/types.js";
 
-export default function createTaskCheckEmbed(options: Task) {
+const createTaskCheckEmbed = (options: Task) => {
     const baseEmbed = new EmbedBuilder()
         .setColor(THEME_COLOR())
         .setDescription(`taskId: ${options.taskId}`)
@@ -35,4 +35,6 @@ export default function createTaskCheckEmbed(options: Task) {
               iconURL: options.assignee.displayAvatarURL()
           })
         : baseEmbed;
-}
+};
+
+export { createTaskCheckEmbed };

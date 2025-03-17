@@ -7,13 +7,13 @@ import {
     Events
 } from "discord.js";
 import messages from "../data/messages.json" with { type: "json" };
-import taskCheck from "../embeds/task-check.js";
-import format from "../format.js";
+import { createTaskCheckEmbed } from "../embeds/task-check.js";
+import { format } from "../format.js";
 import { writeToSheet, updateTaskCompletion, resetTaskCompletion } from "../sheets.js";
 import { randomUUID } from "crypto";
 import { CHANNEL_ID, TIMEZONE_OFFSET } from "../env.js";
 
-export default {
+const slashCommand = {
     data: new SlashCommandBuilder()
         .setName(messages.commands.task.name)
         .setDescription(messages.commands.task.description)
@@ -39,7 +39,7 @@ export default {
                 .setRequired(false)
         ),
 
-    execute: async function (interaction: CommandInteraction) {
+    execute: async (interaction: CommandInteraction): Promise<void> => {
         const options = interaction.options as CommandInteractionOptionResolver;
 
         const taskId = randomUUID();
@@ -50,7 +50,7 @@ export default {
         const assignee = options.getUser("user", true);
         const notes = options.getString("notes") || "なし";
 
-        const taskCheckEmbed = taskCheck({ taskId, taskContent, deadline, notes, assignee });
+        const taskCheckEmbed = createTaskCheckEmbed({ taskId, taskContent, deadline, notes, assignee });
 
         // 依頼主に確認で送る用
         const interactionCallbackResponse = await interaction.reply({
@@ -87,7 +87,7 @@ export default {
     }
 };
 
-export const monitorReactions = (client: Client) => {
+const monitorReactions = (client: Client) => {
     client.on(Events.MessageReactionAdd, async (reaction, partialUser) => {
         if (reaction.emoji.name === "✅" && !partialUser.bot) {
             const taskMessage = await reaction.message.fetch();
@@ -137,3 +137,5 @@ export const monitorReactions = (client: Client) => {
         }
     });
 };
+
+export { slashCommand, monitorReactions };

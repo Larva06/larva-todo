@@ -2,13 +2,13 @@
 
 import { Client, TextChannel } from "discord.js";
 import messages from "./data/messages.json" with { type: "json" };
-import format from "./format.js";
+import { format } from "./format.js";
 import { getUncompletedTasks } from "./sheets.js";
 import { CHANNEL_ID } from "./env.js";
-import createTaskCheckEmbed from "./embeds/task-check.js";
+import { createTaskCheckEmbed } from "./embeds/task-check.js";
 import type { Task } from "./types/types.js";
 
-export async function checkAndSendReminders(client: Client) {
+const checkAndSendReminders = async (client: Client): Promise<void> => {
     const tasks = await getUncompletedTasks();
     const now = new Date();
 
@@ -24,9 +24,9 @@ export async function checkAndSendReminders(client: Client) {
     }
 
     console.log("リマインダーをチェックしました。");
-}
+};
 
-async function sendReminder(client: Client, task: Task & { assignee: string }) {
+const sendReminder = async (client: Client, task: Task & { assignee: string }): Promise<void> => {
     const channel = await client.channels.fetch(CHANNEL_ID());
 
     if (channel instanceof TextChannel) {
@@ -49,4 +49,6 @@ async function sendReminder(client: Client, task: Task & { assignee: string }) {
     } else {
         console.error(messages.log.messageSendFail);
     }
-}
+};
+
+export { checkAndSendReminders, sendReminder };
