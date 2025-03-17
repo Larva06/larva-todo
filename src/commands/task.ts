@@ -46,21 +46,21 @@ export default {
         const taskContent = options.getString("task-content", true);
         const rawDeadLine = options.getString("dead-line", true); // "2025/03/17"
         const isoDate = rawDeadLine.replace(/\//g, "-"); // "2025-03-17"
-        const deadLine = `${isoDate}T23:59:59${TIMEZONE_OFFSET()}`; // "2025-03-17T23:59:59+09:00"
-        const user = options.getUser("user", true);
+        const deadline = `${isoDate}T23:59:59${TIMEZONE_OFFSET()}`; // "2025-03-17T23:59:59+09:00"
+        const assignee = options.getUser("user", true);
         const notes = options.getString("notes") || "なし";
 
-        const taskCheckEmbed = taskCheck(taskId, taskContent, deadLine, notes, user);
+        const taskCheckEmbed = taskCheck({ taskId, taskContent, deadline, notes, assignee });
 
         // 依頼主に確認で送る用
         const reply = await interaction.reply({
-            content: format(messages.guild.taskCheck.title, user.toString()),
+            content: format(messages.guild.taskCheck.title, assignee.toString()),
             embeds: [taskCheckEmbed],
             fetchReply: true
         });
 
         // ユーザー名の記録方法を変更する場合は、`src/reminders.ts`の`sendReminder()`の正規表現も変更する必要がある
-        await writeToSheet(taskId, taskContent, deadLine, `${user.displayName} (${user.id})`, notes);
+        await writeToSheet(taskId, taskContent, deadline, `${assignee.displayName} (${assignee.id})`, notes);
 
         // 依頼された人に送る用
         const channel = await interaction.client.channels.fetch(CHANNEL_ID());

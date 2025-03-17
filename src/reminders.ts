@@ -5,6 +5,8 @@ import messages from "./data/messages.json" with { type: "json" };
 import format from "./format.js";
 import { getUncompletedTasks } from "./sheets.js";
 import { CHANNEL_ID } from "./env.js";
+import createTaskCheckEmbed from "./embeds/task-check.js";
+import type { Task } from "./types/types.js";
 
 export async function checkAndSendReminders(client: Client) {
     const tasks = await getUncompletedTasks();
@@ -17,38 +19,30 @@ export async function checkAndSendReminders(client: Client) {
 
         // Send reminder if deadline is between 23-24 hours away
         if (hoursDiff <= 24 && hoursDiff > 23) {
-            await sendReminder(client, task.user, task.taskContent, task.deadline);
+            await sendReminder(client, task);
         }
     }
 
     console.log("リマインダーをチェックしました。");
 }
 
-async function sendReminder(client: Client, user: string, taskContent: string, deadline: string) {
+async function sendReminder(client: Client, task: Task & { assignee: string }) {
     const channel = await client.channels.fetch(CHANNEL_ID());
 
     if (channel instanceof TextChannel) {
         // `表示名 (ユーザーID)`の形式からユーザーIDを抽出
-        const userId = user.match(/.*\(([^)]+)\)\s*$/)?.[1] || "";
+        const userId = task.assignee.match(/.*\(([^)]+)\)\s*$/)?.[1] || "";
         const message = format(messages.guild.task.reTitle, `<@${userId}>`);
+
+        const embed = createTaskCheckEmbed(task);
+
         await channel.send({
             content: message,
-            embeds: [
-                {
-                    fields: [
-                        {
-                            name: messages.guild.task.embeds.field1_name,
-                            value: taskContent
-                        },
-                        {
-                            name: messages.guild.task.embeds.field2_name,
-                            value: deadline
-                        }
-                    ]
-                }
-            ]
+            embeds: [embed]
         });
-        console.log(`リマインダーを送信しました。ユーザー: ${user}, タスク内容: ${taskContent}, 締め切り: ${deadline}`);
+        console.log(
+            `リマインダーを送信しました。ユーザー: ${task.assignee}, タスク内容: ${task.taskContent}, 締め切り: ${task.deadline}`
+        );
     } else {
         console.error(messages.log.messageSendFail);
     }

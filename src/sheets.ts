@@ -3,6 +3,7 @@
 import { google } from "googleapis";
 import messages from "./data/messages.json" with { type: "json" };
 import { GOOGLE_SERVICE_ACCOUNT_EMAIL, GOOGLE_PRIVATE_KEY, SPREADSHEET_ID, SHEET_NAME } from "./env.js";
+import type { Task } from "./types/types.js";
 
 const SCOPES = ["https://www.googleapis.com/auth/spreadsheets"];
 const auth = new google.auth.JWT(
@@ -76,7 +77,7 @@ export async function resetTaskCompletion(taskId: string) {
     return updateTask(taskId, ["FALSE", ""], "未完了状態にリセット");
 }
 
-export async function getUncompletedTasks() {
+export async function getUncompletedTasks(): Promise<Array<Task & { assignee: string }>> {
     const spreadsheetId = SPREADSHEET_ID()!;
     const sheetName = SHEET_NAME()!;
 
@@ -98,7 +99,8 @@ export async function getUncompletedTasks() {
                 taskId: row[0],
                 taskContent: row[1],
                 deadline: row[2],
-                user: row[3]
+                assignee: row[3],
+                notes: row[4]
             }));
     } catch (error) {
         console.error("未完了タスクの取得中にエラーが発生しました：", error);
