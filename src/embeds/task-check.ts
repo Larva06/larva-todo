@@ -5,7 +5,7 @@ import messages from "../data/messages.json" with { type: "json" };
 import { THEME_COLOR } from "../env.js";
 import type { Task } from "../types/types.js";
 
-const createTaskCheckEmbed = (options: Task) => {
+const createTaskCheckEmbed = (options: Task): EmbedBuilder => {
     const baseEmbed = new EmbedBuilder()
         .setColor(THEME_COLOR())
         .setDescription(`taskId: ${options.taskId}`)

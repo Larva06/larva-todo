@@ -12,7 +12,7 @@ const client = new Client({
     partials: [Partials.Message, Partials.Reaction]
 });
 
-client.once(Events.ClientReady, async () => {
+client.once(Events.ClientReady, async (): Promise<void> => {
     console.log("Ready!");
     if (client.user) {
         console.log(client.user.tag);
@@ -30,7 +30,7 @@ client.once(Events.ClientReady, async () => {
 });
 
 // slash command
-client.on(Events.InteractionCreate, async (interaction) => {
+client.on(Events.InteractionCreate, async (interaction): Promise<void> => {
     if (!interaction.isCommand()) return;
 
     if (interaction.commandName === "task") {
