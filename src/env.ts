@@ -1,5 +1,3 @@
-// env.ts
-
 import dotenv from "dotenv";
 import type { ColorResolvable } from "discord.js";
 

@@ -1,5 +1,3 @@
-// sheets.ts
-
 import { google } from "googleapis";
 import messages from "./data/messages.json" with { type: "json" };
 import { GOOGLE_SERVICE_ACCOUNT_EMAIL, GOOGLE_PRIVATE_KEY, SPREADSHEET_ID, SHEET_NAME } from "./env.js";

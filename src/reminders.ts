@@ -1,5 +1,3 @@
-// reminders.ts
-
 import { Client, TextChannel } from "discord.js";
 import messages from "./data/messages.json" with { type: "json" };
 import { format } from "./format.js";
