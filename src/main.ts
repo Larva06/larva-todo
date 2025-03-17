@@ -4,7 +4,7 @@ import { GatewayIntentBits, Client, Partials, Events, TextChannel } from "discor
 import { CHANNEL_ID, DISCORD_TOKEN } from "./env.js";
 
 // Slash command
-import task, { monitorReactions } from "./commands/task.js";
+import { monitorReactions, slashCommand } from "./commands/task.js";
 import { checkAndSendReminders } from "./reminders.js";
 
 const client = new Client({
@@ -34,7 +34,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
     if (!interaction.isCommand()) return;
 
     if (interaction.commandName === "task") {
-        await task.execute(interaction);
+        await slashCommand.execute(interaction);
     }
 });
 

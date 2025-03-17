@@ -15,7 +15,7 @@ const auth = new google.auth.JWT(
 
 const sheets = google.sheets({ version: "v4", auth });
 
-export async function writeToSheet(options: Task) {
+const writeToSheet = async (options: Task): Promise<void> => {
     const spreadsheetId = SPREADSHEET_ID()!;
     const sheetName = SHEET_NAME()!;
 
@@ -42,9 +42,9 @@ export async function writeToSheet(options: Task) {
     } catch (error) {
         console.error(messages.log.spreadFail, error);
     }
-}
+};
 
-async function updateTask(taskId: string, values: [string, string], action: string) {
+const updateTask = async (taskId: string, values: [string, string], action: string): Promise<void> => {
     const spreadsheetId = SPREADSHEET_ID()!;
     const sheetName = SHEET_NAME()!;
 
@@ -77,17 +77,17 @@ async function updateTask(taskId: string, values: [string, string], action: stri
     } catch (error) {
         console.error(`タスクの${action}中にエラーが発生しました：`, error);
     }
-}
+};
 
-export async function updateTaskCompletion(taskId: string, completedAt: string) {
+const updateTaskCompletion = async (taskId: string, completedAt: string): Promise<void> => {
     return updateTask(taskId, ["TRUE", completedAt], "完了に更新");
-}
+};
 
-export async function resetTaskCompletion(taskId: string) {
+const resetTaskCompletion = async (taskId: string): Promise<void> => {
     return updateTask(taskId, ["FALSE", ""], "未完了状態にリセット");
-}
+};
 
-export async function getUncompletedTasks(): Promise<Array<Task & { assignee: string }>> {
+const getUncompletedTasks = async (): Promise<Array<Task & { assignee: string }>> => {
     const spreadsheetId = SPREADSHEET_ID()!;
     const sheetName = SHEET_NAME()!;
 
@@ -116,4 +116,6 @@ export async function getUncompletedTasks(): Promise<Array<Task & { assignee: st
         console.error("未完了タスクの取得中にエラーが発生しました：", error);
         return [];
     }
-}
+};
+
+export { writeToSheet, updateTask, updateTaskCompletion, resetTaskCompletion, getUncompletedTasks };
