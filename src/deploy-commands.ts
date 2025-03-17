@@ -8,11 +8,11 @@ const commands = [slashCommand.data.toJSON()];
 
 const rest = new REST({
     version: "10"
-}).setToken(DISCORD_TOKEN());
+}).setToken(DISCORD_TOKEN);
 
 void (async (): Promise<void> => {
     try {
-        await rest.put(Routes.applicationGuildCommands(APPLICATION_ID(), GUILD_ID()), {
+        await rest.put(Routes.applicationGuildCommands(APPLICATION_ID, GUILD_ID), {
             body: commands
         });
         logInfo(message.log.commandRegSuc);

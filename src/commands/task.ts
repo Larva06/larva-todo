@@ -47,7 +47,7 @@ const slashCommand = {
         const taskContent = options.getString("task-content", true);
         const rawDeadLine = options.getString("dead-line", true); // "2025/03/17"
         const isoDate = rawDeadLine.replace(/\//g, "-"); // "2025-03-17"
-        const deadline = `${isoDate}T23:59:59${TIMEZONE_OFFSET()}`; // "2025-03-17T23:59:59+09:00"
+        const deadline = `${isoDate}T23:59:59${TIMEZONE_OFFSET}`; // "2025-03-17T23:59:59+09:00"
         const assignee = options.getUser("user", true);
         const notes = options.getString("notes") || "なし";
 
@@ -70,7 +70,7 @@ const slashCommand = {
         });
 
         // 依頼された人に送る用
-        const channel = await interaction.client.channels.fetch(CHANNEL_ID());
+        const channel = await interaction.client.channels.fetch(CHANNEL_ID);
 
         if (channel instanceof TextChannel) {
             const { resource } = interactionCallbackResponse;
