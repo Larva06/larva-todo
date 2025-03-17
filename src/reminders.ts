@@ -36,10 +36,13 @@ async function sendReminder(client: Client, task: Task & { assignee: string }) {
 
         const embed = createTaskCheckEmbed(task);
 
-        await channel.send({
+        const reminder = await channel.send({
             content: message,
             embeds: [embed]
         });
+
+        // リマインダーメッセージにもチェックマークリアクションを追加
+        await reminder.react("✅");
         console.log(
             `リマインダーを送信しました。ユーザー: ${task.assignee}, タスク内容: ${task.taskContent}, 締め切り: ${task.deadline}`
         );
