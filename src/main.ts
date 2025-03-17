@@ -1,7 +1,5 @@
 import { CHANNEL_ID, DISCORD_TOKEN } from "./env.js";
 import { Client, Events, GatewayIntentBits, Partials, TextChannel } from "discord.js";
-
-// Slash command
 import { monitorReactions, slashCommand } from "./commands/task.js";
 import { checkAndSendReminders } from "./reminders.js";
 import { logInfo } from "./log.js";

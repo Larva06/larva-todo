@@ -1,11 +1,11 @@
 import { type Client, TextChannel } from "discord.js";
+import { logError, logInfo } from "./log.js";
 import { CHANNEL_ID } from "./env.js";
 import type { Task } from "./types/types.js";
 import { createTaskCheckEmbed } from "./embeds/task-check.js";
 import { format } from "./format.js";
 import { getUncompletedTasks } from "./sheets.js";
 import messages from "./data/messages.json" with { type: "json" };
-import { logError, logInfo } from "./log.js";
 
 const checkAndSendReminders = async (client: Client): Promise<void> => {
     const tasks = await getUncompletedTasks();
