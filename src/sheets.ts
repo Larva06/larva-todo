@@ -1,11 +1,11 @@
+import sheets from "@googleapis/sheets";
 import { GOOGLE_PRIVATE_KEY, GOOGLE_SERVICE_ACCOUNT_EMAIL, SHEET_NAME, SPREADSHEET_ID } from "./env.js";
 import { logError, logInfo } from "./log.js";
 import type { Task } from "./types/types.js";
-import { google } from "googleapis";
 import messages from "./data/messages.json" with { type: "json" };
 
 const SCOPES = ["https://www.googleapis.com/auth/spreadsheets"];
-const auth = new google.auth.JWT(
+const auth = new sheets.auth.JWT(
     GOOGLE_SERVICE_ACCOUNT_EMAIL,
     // eslint-disable-next-line no-undefined
     undefined,
@@ -13,14 +13,14 @@ const auth = new google.auth.JWT(
     SCOPES
 );
 
-const sheets = google.sheets({ auth, version: "v4" });
+const taskSheets = sheets.sheets({ auth, version: "v4" });
 
 const writeToSheet = async (options: Task): Promise<void> => {
     const spreadsheetId = SPREADSHEET_ID;
     const sheetName = SHEET_NAME;
 
     try {
-        await sheets.spreadsheets.values.append({
+        await taskSheets.spreadsheets.values.append({
             range: `${sheetName}!A:G`,
             requestBody: {
                 values: [
@@ -50,7 +50,7 @@ const updateTask = async (taskId: string, values: [string, string], action: stri
     const sheetName = SHEET_NAME;
 
     try {
-        const response = await sheets.spreadsheets.values.get({
+        const response = await taskSheets.spreadsheets.values.get({
             range: `${sheetName}!A:A`,
             spreadsheetId
         });
@@ -69,7 +69,7 @@ const updateTask = async (taskId: string, values: [string, string], action: stri
             return;
         }
 
-        await sheets.spreadsheets.values.update({
+        await taskSheets.spreadsheets.values.update({
             range: `${sheetName}!F${rowIndex.toString()}:G${rowIndex.toString()}`,
             requestBody: { values: [values] },
             spreadsheetId,
@@ -97,7 +97,7 @@ const getUncompletedTasks = async (): Promise<Array<Task & { assignee: string }>
     const sheetName = SHEET_NAME;
 
     try {
-        const response = await sheets.spreadsheets.values.get({
+        const response = await taskSheets.spreadsheets.values.get({
             range: `${sheetName}!A:F`,
             spreadsheetId
         });

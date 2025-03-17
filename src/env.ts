@@ -1,7 +1,4 @@
 import type { ColorResolvable } from "discord.js";
-import { config } from "dotenv";
-
-config();
 
 const loadEnv = (name: string): string => {
     const value = process.env[name];
