@@ -87,7 +87,7 @@ const slashCommand = {
     }
 };
 
-const monitorReactions = (client: Client) => {
+const monitorReactions = (client: Client): void => {
     client.on(Events.MessageReactionAdd, async (reaction, partialUser) => {
         if (reaction.emoji.name === "✅" && !partialUser.bot) {
             const taskMessage = await reaction.message.fetch();
