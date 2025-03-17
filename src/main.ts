@@ -26,8 +26,7 @@ client.once(Events.ClientReady, async () => {
     console.log("メッセージキャッシュを構築しました。");
 
     // 1時間ごとにリマインダーをチェック
-    setInterval(() => checkAndSendReminders(client), 1000 * 10);
-    console.log("リマインダーチェックを開始しました。");
+    setInterval(() => checkAndSendReminders(client), 1000 * 60 * 60);
 });
 
 // slash command
