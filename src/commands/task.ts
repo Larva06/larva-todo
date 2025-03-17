@@ -79,7 +79,10 @@ export const monitorReactions = (client: Client) => {
         if (reaction.emoji.name === "✅" && !partialUser.bot) {
             const taskMessage = await reaction.message.fetch();
 
-            if (taskMessage.content.includes("下記の内容で依頼を送信します！")) {
+            if (
+                taskMessage.content.includes("下記の内容で依頼を送信します！") ||
+                taskMessage.content.includes("締め切り日の24時間前です！")
+            ) {
                 const description = taskMessage.embeds[0]?.description;
                 const taskId = description?.match(/taskId: ([^]+)/)?.[1];
 
@@ -105,12 +108,16 @@ export const monitorReactions = (client: Client) => {
         if (reaction.emoji.name === "✅" && !partialUser.bot) {
             const taskMessage = await reaction.message.fetch();
 
-            if (taskMessage.content.includes("下記の内容で依頼を送信します！")) {
+            if (
+                taskMessage.content.includes("下記の内容で依頼を送信します！") ||
+                taskMessage.content.includes("締め切り日の24時間前です！")
+            ) {
                 const description = taskMessage.embeds[0]?.description;
                 const taskId = description?.match(/taskId: ([^]+)/)?.[1];
 
                 if (taskId) {
-                    console.log(`リアクションが削除されました。タスクID: ${taskId}`);
+                    const timestamp = new Date().toISOString();
+                    console.log(`リアクションが削除されました。タスクID: ${taskId}, タイムスタンプ: ${timestamp}`);
                     await resetTaskCompletion(taskId);
                 }
             }
