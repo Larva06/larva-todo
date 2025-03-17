@@ -24,7 +24,7 @@ export async function writeToSheet(taskId: string, taskContent: string, deadLine
             range: `${sheetName}!A:G`,
             valueInputOption: "USER_ENTERED",
             requestBody: {
-                values: [[taskId, taskContent, deadLine, user, notes, "false", ""]]
+                values: [[taskId, taskContent, deadLine, user, notes, "FALSE", ""]]
             }
         });
         console.log(messages.log.spreadSuc);
@@ -69,11 +69,11 @@ async function updateTask(taskId: string, values: [string, string], action: stri
 }
 
 export async function updateTaskCompletion(taskId: string, completedAt: string) {
-    return updateTask(taskId, ["true", completedAt], "完了に更新");
+    return updateTask(taskId, ["TRUE", completedAt], "完了に更新");
 }
 
 export async function resetTaskCompletion(taskId: string) {
-    return updateTask(taskId, ["false", ""], "未完了状態にリセット");
+    return updateTask(taskId, ["FALSE", ""], "未完了状態にリセット");
 }
 
 export async function getUncompletedTasks() {
@@ -92,10 +92,8 @@ export async function getUncompletedTasks() {
             return [];
         }
 
-        // Skip header row and filter uncompleted tasks
         return rows
-            .slice(1)
-            .filter((row) => row[5] === "false") // F列（completed）が false のもの
+            .filter((row) => row[5] === "FALSE") // F列（completed）が FALSE のもの
             .map((row) => ({
                 taskId: row[0],
                 taskContent: row[1],

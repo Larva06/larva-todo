@@ -20,6 +20,8 @@ export async function checkAndSendReminders(client: Client) {
             await sendReminder(client, task.user, task.taskContent, task.deadline);
         }
     }
+
+    console.log("リマインダーをチェックしました。");
 }
 
 async function sendReminder(client: Client, user: string, taskContent: string, deadline: string) {
@@ -46,6 +48,7 @@ async function sendReminder(client: Client, user: string, taskContent: string, d
                 }
             ]
         });
+        console.log(`リマインダーを送信しました。ユーザー: ${user}, タスク内容: ${taskContent}, 締め切り: ${deadline}`);
     } else {
         console.error(messages.log.messageSendFail);
     }
