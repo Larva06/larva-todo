@@ -1,28 +1,27 @@
+import sheets from "@googleapis/sheets";
 import { GOOGLE_PRIVATE_KEY, GOOGLE_SERVICE_ACCOUNT_EMAIL, SHEET_NAME, SPREADSHEET_ID } from "./env.js";
 import { logError, logInfo } from "./log.js";
 import type { Task } from "./types/types.js";
-import { google } from "googleapis";
 import messages from "./data/messages.json" with { type: "json" };
 
 const SCOPES = ["https://www.googleapis.com/auth/spreadsheets"];
-const auth = new google.auth.JWT(
+const auth = new sheets.auth.JWT(
     GOOGLE_SERVICE_ACCOUNT_EMAIL,
+    // eslint-disable-next-line no-undefined
     undefined,
-    GOOGLE_PRIVATE_KEY.replace(/\\n/g, "\n"),
+    GOOGLE_PRIVATE_KEY.replace(/\\n/gu, "\n"),
     SCOPES
 );
 
-const sheets = google.sheets({ version: "v4", auth });
+const taskSheets = sheets.sheets({ auth, version: "v4" });
 
 const writeToSheet = async (options: Task): Promise<void> => {
     const spreadsheetId = SPREADSHEET_ID;
     const sheetName = SHEET_NAME;
 
     try {
-        await sheets.spreadsheets.values.append({
-            spreadsheetId,
+        await taskSheets.spreadsheets.values.append({
             range: `${sheetName}!A:G`,
-            valueInputOption: "USER_ENTERED",
             requestBody: {
                 values: [
                     [
@@ -35,7 +34,9 @@ const writeToSheet = async (options: Task): Promise<void> => {
                         ""
                     ]
                 ]
-            }
+            },
+            spreadsheetId,
+            valueInputOption: "USER_ENTERED"
         });
         logInfo(messages.log.spreadSuc);
     } catch (error) {
@@ -43,14 +44,15 @@ const writeToSheet = async (options: Task): Promise<void> => {
     }
 };
 
+// eslint-disable-next-line max-statements
 const updateTask = async (taskId: string, values: [string, string], action: string): Promise<void> => {
     const spreadsheetId = SPREADSHEET_ID;
     const sheetName = SHEET_NAME;
 
     try {
-        const response = await sheets.spreadsheets.values.get({
-            spreadsheetId,
-            range: `${sheetName}!A:A`
+        const response = await taskSheets.spreadsheets.values.get({
+            range: `${sheetName}!A:A`,
+            spreadsheetId
         });
 
         const rows = response.data.values;
@@ -59,17 +61,19 @@ const updateTask = async (taskId: string, values: [string, string], action: stri
             return;
         }
 
+        // 0はじまりのインデックスを1はじまりの行番号に変換して取得
+        // eslint-disable-next-line no-magic-numbers
         const rowIndex = rows.findIndex((row) => row[0] === taskId) + 1;
-        if (rowIndex === 0) {
+        if (!rowIndex) {
             logError(`タスク（${taskId}）が見つかりませんでした。`);
             return;
         }
 
-        await sheets.spreadsheets.values.update({
+        await taskSheets.spreadsheets.values.update({
+            range: `${sheetName}!F${rowIndex.toString()}:G${rowIndex.toString()}`,
+            requestBody: { values: [values] },
             spreadsheetId,
-            range: `${sheetName}!F${rowIndex}:G${rowIndex}`,
-            valueInputOption: "USER_ENTERED",
-            requestBody: { values: [values] }
+            valueInputOption: "USER_ENTERED"
         });
 
         logInfo(`タスク（${taskId}）を${action}しました。`);
@@ -78,22 +82,24 @@ const updateTask = async (taskId: string, values: [string, string], action: stri
     }
 };
 
-const updateTaskCompletion = async (taskId: string, completedAt: string): Promise<void> => {
-    return updateTask(taskId, ["TRUE", completedAt], "完了に更新");
+const updateTaskCompletion = async (taskId: string): Promise<void> => {
+    const timestamp = new Date().toISOString();
+    await updateTask(taskId, ["TRUE", timestamp], "完了に更新");
 };
 
 const resetTaskCompletion = async (taskId: string): Promise<void> => {
-    return updateTask(taskId, ["FALSE", ""], "未完了状態にリセット");
+    await updateTask(taskId, ["FALSE", ""], "未完了状態にリセット");
 };
 
+// eslint-disable-next-line max-statements
 const getUncompletedTasks = async (): Promise<Array<Task & { assignee: string }>> => {
     const spreadsheetId = SPREADSHEET_ID;
     const sheetName = SHEET_NAME;
 
     try {
-        const response = await sheets.spreadsheets.values.get({
-            spreadsheetId,
-            range: `${sheetName}!A:F`
+        const response = await taskSheets.spreadsheets.values.get({
+            range: `${sheetName}!A:F`,
+            spreadsheetId
         });
 
         const rows = response.data.values;
@@ -103,13 +109,15 @@ const getUncompletedTasks = async (): Promise<Array<Task & { assignee: string }>
         }
 
         return rows
-            .filter((row) => row[5] === "FALSE") // F列（completed）が FALSE のもの
+            .filter((row) => row[5] === "FALSE")
             .map((row) => ({
-                taskId: row[0],
-                taskContent: row[1],
-                deadline: row[2],
+                /* eslint-disable @typescript-eslint/no-unsafe-assignment */
                 assignee: row[3],
-                notes: row[4]
+                deadline: row[2],
+                notes: row[4],
+                taskContent: row[1],
+                taskId: row[0]
+                /* eslint-enable @typescript-eslint/no-unsafe-assignment */
             }));
     } catch (error) {
         logError("未完了タスクの取得中にエラーが発生しました：", error);

@@ -1,30 +1,30 @@
 {
   "name": "larva-todo",
+  "private": true,
   "version": "1.0.0",
-  "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "tsx src/main.ts",
-    "commands": "tsx src/deploy-commands.ts",
-    "start": "node dist/main.js",
+    "commands": "dotenv -- node ./dist/deploy-commands.js",
+    "start": "dotenv -- node ./dist/main.js",
     "build": "tsc",
     "format": "prettier ./src --write",
-    "format:check": "prettier ./src --check"
+    "format:check": "prettier ./src --check",
+    "lint": "eslint ./src/**/*.ts"
   },
   "keywords": [],
   "author": "",
   "license": "MIT",
   "description": "",
   "dependencies": {
-    "@types/node": "^22.13.0",
+    "@googleapis/sheets": "^9.4.0",
     "discord.js": "^14.17.3",
-    "dotenv": "^16.4.7",
-    "googleapis": "^144.0.0",
-    "typescript": "^5.7.3"
+    "dotenv-cli": "^8.0.0",
+    "typescript": "^5.8.2"
   },
   "devDependencies": {
-    "eslint": "^9.19.0",
-    "prettier": "^3.5.2",
-    "tsx": "^4.19.3"
+    "@robot-inventor/eslint-config": "^8.0.0",
+    "@types/node": "^22.13.0",
+    "eslint": "^9.21.0",
+    "prettier": "^3.5.2"
   }
 }
