@@ -1,6 +1,6 @@
+import { APPLICATION_ID, DISCORD_TOKEN, GUILD_ID } from "./env.js";
 import { REST, Routes } from "discord.js";
 import message from "./data/messages.json" with { type: "json" };
-import { DISCORD_TOKEN, APPLICATION_ID, GUILD_ID } from "./env.js";
 
 import { slashCommand } from "./commands/task.js";
 

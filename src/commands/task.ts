@@ -1,17 +1,17 @@
+import { CHANNEL_ID, TIMEZONE_OFFSET } from "../env.js";
 import {
-    CommandInteraction,
-    CommandInteractionOptionResolver,
+    type Client,
+    type CommandInteraction,
+    type CommandInteractionOptionResolver,
+    Events,
     SlashCommandBuilder,
-    TextChannel,
-    Client,
-    Events
+    TextChannel
 } from "discord.js";
-import messages from "../data/messages.json" with { type: "json" };
+import { resetTaskCompletion, updateTaskCompletion, writeToSheet } from "../sheets.js";
 import { createTaskCheckEmbed } from "../embeds/task-check.js";
 import { format } from "../format.js";
-import { writeToSheet, updateTaskCompletion, resetTaskCompletion } from "../sheets.js";
+import messages from "../data/messages.json" with { type: "json" };
 import { randomUUID } from "crypto";
-import { CHANNEL_ID, TIMEZONE_OFFSET } from "../env.js";
 
 const slashCommand = {
     data: new SlashCommandBuilder()
