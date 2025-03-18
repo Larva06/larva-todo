@@ -1,20 +1,17 @@
 import { type Client, TextChannel } from "discord.js";
 import { logError, logInfo } from "./log.js";
 import { CHANNEL_ID } from "./env.js";
-import type { Task } from "./types/types.js";
+import type { TaskDataForSheets } from "./types/types.js";
 import { createTaskCheckEmbed } from "./embeds/task-check.js";
 import { format } from "./format.js";
 import { getUncompletedTasks } from "./sheets.js";
 import messages from "./data/messages.json" with { type: "json" };
 
-const sendReminder = async (client: Client, task: Task & { assignee: string }): Promise<void> => {
+const sendReminder = async (client: Client, task: TaskDataForSheets): Promise<void> => {
     const channel = await client.channels.fetch(CHANNEL_ID);
 
     if (channel instanceof TextChannel) {
-        // `表示名 (ユーザーID)`の形式からユーザーIDを抽出
-        const userIdMatch = /.*\((?<userId>[^)]+)\)\s*$/u.exec(task.assignee);
-        const userId = userIdMatch?.groups?.["userId"] ?? "";
-        const message = format(messages.guild.task.reTitle, `<@${userId}>`);
+        const message = format(messages.guild.task.reTitle, task.assigneeId);
 
         const embed = createTaskCheckEmbed(task);
 
@@ -26,7 +23,7 @@ const sendReminder = async (client: Client, task: Task & { assignee: string }): 
         // リマインダーメッセージにもチェックマークリアクションを追加
         await reminder.react("✅");
         logInfo(
-            `リマインダーを送信しました。ユーザー: ${task.assignee}, タスク内容: ${task.taskContent}, 締め切り: ${task.deadline}`
+            `リマインダーを送信しました。ユーザー: ${task.assigneeName}, タスク内容: ${task.taskContent}, 締め切り: ${task.deadline}`
         );
     } else {
         logError(messages.log.messageSendFail);

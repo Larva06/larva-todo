@@ -1,22 +1,44 @@
-import { CHANNEL_ID, TIMEZONE_OFFSET } from "../env.js";
 import {
+    type APIInteractionDataResolvedGuildMember,
+    type APIRole,
     type Client,
     type CommandInteraction,
     type CommandInteractionOptionResolver,
     Events,
+    type GuildMember,
     type MessageReaction,
     type PartialMessageReaction,
     type PartialUser,
+    Role,
     SlashCommandBuilder,
     TextChannel,
-    type User
+    User
 } from "discord.js";
+import { CHANNEL_ID, TIMEZONE_OFFSET } from "../env.js";
 import { logError, logInfo } from "../log.js";
 import { resetTaskCompletion, updateTaskCompletion, writeToSheet } from "../sheets.js";
 import { createTaskCheckEmbed } from "../embeds/task-check.js";
 import { format } from "../format.js";
 import messages from "../data/messages.json" with { type: "json" };
 import { randomUUID } from "crypto";
+
+const convertMentionableToUserOrRole = (
+    mentionable: GuildMember | APIInteractionDataResolvedGuildMember | Role | APIRole | User
+): User | Role | null => {
+    if (mentionable instanceof User) {
+        return mentionable;
+    }
+
+    if (mentionable instanceof Role) {
+        return mentionable;
+    }
+
+    if ("user" in mentionable) {
+        return mentionable.user;
+    }
+
+    return null;
+};
 
 const slashCommand = {
     data: new SlashCommandBuilder()
@@ -34,8 +56,11 @@ const slashCommand = {
                 .setDescription(messages.commands.task.stringOption[2].description)
                 .setRequired(true)
         )
-        .addUserOption((option) =>
-            option.setName("user").setDescription(messages.commands.task.stringOption[3].description).setRequired(true)
+        .addMentionableOption((option) =>
+            option
+                .setName("assignee")
+                .setDescription(messages.commands.task.stringOption[3].description)
+                .setRequired(true)
         )
         .addStringOption((option) =>
             option
@@ -58,10 +83,28 @@ const slashCommand = {
         const isoDate = rawDeadLine.replace(/\//gu, "-");
         const deadline = `${isoDate}T23:59:59${TIMEZONE_OFFSET}`;
 
-        const assignee = options.getUser("user", true);
+        const mentionableAssignee = options.getMentionable("assignee", true);
         const notes = options.getString("notes") ?? "なし";
 
-        const taskCheckEmbed = createTaskCheckEmbed({ assignee, deadline, notes, taskContent, taskId });
+        const assignee = convertMentionableToUserOrRole(mentionableAssignee);
+
+        if (!assignee) {
+            logError("タスクの依頼先が無効です。", mentionableAssignee);
+            await interaction.reply({
+                content: "タスクの依頼先が無効です。ユーザーまたはロールを指定してください。",
+                ephemeral: true
+            });
+            return;
+        }
+
+        const taskCheckEmbed = createTaskCheckEmbed({
+            assignee,
+            deadline,
+            notes,
+            taskContent,
+            taskId,
+            type: "discord"
+        });
 
         // 依頼主に確認で送る用
         const interactionCallbackResponse = await interaction.reply({
@@ -70,13 +113,13 @@ const slashCommand = {
             withResponse: true
         });
 
-        // ユーザー名の記録方法を変更する場合は、`src/reminders.ts`の`sendReminder()`の正規表現も変更する必要がある
         await writeToSheet({
-            assignee: `${assignee.displayName} (${assignee.id})`,
+            assignee,
             deadline,
             notes,
             taskContent,
-            taskId
+            taskId,
+            type: "discord"
         });
 
         // 依頼された人に送る用

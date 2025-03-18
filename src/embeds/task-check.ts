@@ -1,9 +1,9 @@
-import { EmbedBuilder, User } from "discord.js";
+import { EmbedBuilder } from "discord.js";
 import { THEME_COLOR } from "../env.js";
-import type { Task } from "../types/types.js";
+import type { TaskData } from "../types/types.js";
 import messages from "../data/messages.json" with { type: "json" };
 
-const createTaskCheckEmbed = (options: Task): EmbedBuilder => {
+const createTaskCheckEmbed = (options: TaskData): EmbedBuilder => {
     const baseEmbed = new EmbedBuilder()
         .setColor(THEME_COLOR)
         .setDescription(`taskId: ${options.taskId}`)
@@ -27,12 +27,22 @@ const createTaskCheckEmbed = (options: Task): EmbedBuilder => {
         })
         .setTimestamp();
 
-    return options.assignee instanceof User
-        ? baseEmbed.setAuthor({
-              iconURL: options.assignee.displayAvatarURL(),
-              name: options.assignee.displayName
-          })
-        : baseEmbed;
+    if (options.type === "sheets") {
+        return baseEmbed.setAuthor({
+            name: options.assigneeName
+        });
+    }
+
+    if ("displayAvatarURL" in options.assignee) {
+        return baseEmbed.setAuthor({
+            iconURL: options.assignee.displayAvatarURL(),
+            name: options.assignee.displayName
+        });
+    }
+
+    return baseEmbed.setAuthor({
+        name: options.assignee.name
+    });
 };
 
 export { createTaskCheckEmbed };
