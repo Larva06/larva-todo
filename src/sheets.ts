@@ -1,11 +1,11 @@
+import { auth as $auth, sheets } from "@googleapis/sheets";
 import { GOOGLE_PRIVATE_KEY, GOOGLE_SERVICE_ACCOUNT_EMAIL, SHEET_NAME, SPREADSHEET_ID } from "./env.js";
 import type { TaskDataForDiscord, TaskDataForSheets } from "./types/types.js";
 import { logError, logInfo } from "./log.js";
 import messages from "./data/messages.json" with { type: "json" };
-import sheets from "@googleapis/sheets";
 
 const SCOPES = ["https://www.googleapis.com/auth/spreadsheets"];
-const auth = new sheets.auth.JWT(
+const auth = new $auth.JWT(
     GOOGLE_SERVICE_ACCOUNT_EMAIL,
     // eslint-disable-next-line no-undefined
     undefined,
@@ -13,7 +13,7 @@ const auth = new sheets.auth.JWT(
     SCOPES
 );
 
-const taskSheets = sheets.sheets({ auth, version: "v4" });
+const taskSheets = sheets({ auth, version: "v4" });
 
 const writeToSheet = async (options: TaskDataForDiscord): Promise<void> => {
     const spreadsheetId = SPREADSHEET_ID;
