@@ -6,6 +6,7 @@ import {
     type CommandInteractionOptionResolver,
     Events,
     type GuildMember,
+    type Message,
     type MessageReaction,
     type PartialMessageReaction,
     type PartialUser,
@@ -21,6 +22,40 @@ import { createTaskCheckEmbed } from "../embeds/task-check.js";
 import { format } from "../format.js";
 import messages from "../data/messages.json" with { type: "json" };
 import { randomUUID } from "crypto";
+
+interface TaskCompletionInfo {
+    assigneeName: string;
+    taskContent: string;
+}
+
+const getTaskCompletionInfo = (message: Message): TaskCompletionInfo | null => {
+    const [embed] = message.embeds;
+
+    return {
+        assigneeName: embed?.author ? embed.author.name : "不明なユーザー",
+        taskContent: embed?.fields[0] ? embed.fields[0].value : "不明なタスク"
+    };
+};
+
+// eslint-disable-next-line max-statements
+const sendCompletionMessage = async (taskMessage: Message, user: User | PartialUser): Promise<void> => {
+    const taskInfo = getTaskCompletionInfo(taskMessage);
+    if (!taskInfo) {
+        logError("タスクのメッセージから必要な情報を取得できませんでした。");
+        return;
+    }
+
+    const { taskContent, assigneeName } = taskInfo;
+    const { channel } = taskMessage;
+
+    if (!channel.isSendable()) {
+        logError("メッセージの送信に必要な情報を取得できませんでした。");
+        return;
+    }
+
+    const completionMessage = format(messages.guild.taskCheck.completion, user.displayName, assigneeName, taskContent);
+    await channel.send(completionMessage);
+};
 
 const convertMentionableToUserOrRole = (
     mentionable: GuildMember | APIInteractionDataResolvedGuildMember | Role | APIRole | User
@@ -183,6 +218,7 @@ const onReactionChange = async (
             if (type === "added") {
                 logInfo(`リアクションが追加されました。タスクID: ${taskId}`);
                 await updateTaskCompletion(taskId);
+                await sendCompletionMessage(taskMessage, user);
             } else {
                 logInfo(`リアクションが削除されました。タスクID: ${taskId}`);
                 await resetTaskCompletion(taskId);
