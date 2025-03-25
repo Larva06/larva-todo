@@ -163,7 +163,7 @@ const slashCommand = {
 
         if (channel instanceof TextChannel) {
             const taskMessage = await channel.send({
-                content: format(messages.guild.task.title, assignee.toString(),interaction.user.toString()),
+                content: format(messages.guild.task.title, assignee.toString(),interaction.user.displayName.toString()),
                 embeds: [taskCheckEmbed]
             });
         
