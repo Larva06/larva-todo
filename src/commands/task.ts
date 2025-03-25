@@ -162,9 +162,8 @@ const slashCommand = {
         const channel = await interaction.client.channels.fetch(CHANNEL_ID);
 
         if (channel instanceof TextChannel) {
-            
             const taskMessage = await channel.send({
-                content: format(messages.guild.task.title, assignee.toString()),
+                content: format(messages.guild.task.title, assignee.toString(),interaction.user.toString()),
                 embeds: [taskCheckEmbed]
             });
         
