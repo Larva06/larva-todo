@@ -69,7 +69,7 @@ const convertMentionableToUserOrRole = (
     }
 
     if ("user" in mentionable) {
-        return mentionable.user;
+        return mentionable.user;    
     }
 
     return null;
@@ -145,7 +145,8 @@ const slashCommand = {
         const interactionCallbackResponse = await interaction.reply({
             content: format(messages.guild.taskCheck.title, assignee.toString()),
             embeds: [taskCheckEmbed],
-            withResponse: true
+            withResponse: true,
+            ephemeral: true
         });
 
         await writeToSheet({
@@ -161,18 +162,23 @@ const slashCommand = {
         const channel = await interaction.client.channels.fetch(CHANNEL_ID);
 
         if (channel instanceof TextChannel) {
+            
+            const taskMessage = await channel.send({
+                content: format(messages.guild.task.title, assignee.toString()),
+                embeds: [taskCheckEmbed]
+            });
+        
             const { resource } = interactionCallbackResponse;
-
             if (!resource?.message) {
                 logError(messages.log.messageSendFail);
                 return;
             }
-
+        
             // リアクションを追加
-            await resource.message.react("✅");
+            await taskMessage.react("✅");
         } else {
             logError(messages.log.messageSendFail);
-        }
+        }        
     }
 };
 
