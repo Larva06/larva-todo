@@ -161,18 +161,23 @@ const slashCommand = {
         const channel = await interaction.client.channels.fetch(CHANNEL_ID);
 
         if (channel instanceof TextChannel) {
+            // 依頼された人へタスクを送信
+            const taskMessage = await channel.send({
+                content: format(messages.guild.task.title, assignee.toString()),
+                embeds: [taskCheckEmbed]
+            });
+        
             const { resource } = interactionCallbackResponse;
-
             if (!resource?.message) {
                 logError(messages.log.messageSendFail);
                 return;
             }
-
+        
             // リアクションを追加
-            await resource.message.react("✅");
+            await taskMessage.react("✅");
         } else {
             logError(messages.log.messageSendFail);
-        }
+        }        
     }
 };
 
