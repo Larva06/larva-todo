@@ -38,7 +38,11 @@ const getTaskCompletionInfo = (message: Message): TaskCompletionInfo | null => {
 };
 
 // eslint-disable-next-line max-statements
-const sendCompletionMessage = async (taskMessage: Message, user: User | PartialUser): Promise<void> => {
+const sendStatusMessage = async (
+    taskMessage: Message,
+    user: User | PartialUser,
+    isComplete: boolean
+): Promise<void> => {
     const taskInfo = getTaskCompletionInfo(taskMessage);
     if (!taskInfo) {
         logError("タスクのメッセージから必要な情報を取得できませんでした。");
@@ -53,8 +57,9 @@ const sendCompletionMessage = async (taskMessage: Message, user: User | PartialU
         return;
     }
 
-    const completionMessage = format(messages.guild.taskCheck.completion, user.displayName, assigneeName, taskContent);
-    await channel.send(completionMessage);
+    const messageTemplate = isComplete ? messages.guild.taskCheck.completion : messages.guild.taskCheck.incomplete;
+    const statusMessage = format(messageTemplate, user.displayName, assigneeName, taskContent);
+    await channel.send(statusMessage);
 };
 
 const convertMentionableToUserOrRole = (
@@ -227,10 +232,11 @@ const onReactionChange = async (
             if (type === "added") {
                 logInfo(`リアクションが追加されました。タスクID: ${taskId}`);
                 await updateTaskCompletion(taskId);
-                await sendCompletionMessage(taskMessage, user);
+                await sendStatusMessage(taskMessage, user, true);
             } else {
                 logInfo(`リアクションが削除されました。タスクID: ${taskId}`);
                 await resetTaskCompletion(taskId);
+                await sendStatusMessage(taskMessage, user, false);
             }
         }
     }
