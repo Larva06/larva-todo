@@ -69,7 +69,7 @@ const convertMentionableToUserOrRole = (
     }
 
     if ("user" in mentionable) {
-        return mentionable.user;    
+        return mentionable.user;
     }
 
     return null;
@@ -145,8 +145,8 @@ const slashCommand = {
         const interactionCallbackResponse = await interaction.reply({
             content: format(messages.guild.taskCheck.title, assignee.toString()),
             embeds: [taskCheckEmbed],
-            withResponse: true,
-            ephemeral: true
+            ephemeral: true,
+            withResponse: true
         });
 
         await writeToSheet({
@@ -163,21 +163,25 @@ const slashCommand = {
 
         if (channel instanceof TextChannel) {
             const taskMessage = await channel.send({
-                content: format(messages.guild.task.title, assignee.toString(),interaction.user.displayName.toString()),
+                content: format(
+                    messages.guild.task.title,
+                    assignee.toString(),
+                    interaction.user.displayName.toString()
+                ),
                 embeds: [taskCheckEmbed]
             });
-        
+
             const { resource } = interactionCallbackResponse;
             if (!resource?.message) {
                 logError(messages.log.messageSendFail);
                 return;
             }
-        
+
             // リアクションを追加
             await taskMessage.react("✅");
         } else {
             logError(messages.log.messageSendFail);
-        }        
+        }
     }
 };
 
@@ -209,7 +213,7 @@ const onReactionChange = async (
         const taskMessage = await reaction.message.fetch();
 
         if (
-            taskMessage.content.includes("下記の内容で依頼を送信します！") ||
+            taskMessage.content.includes("さんから依頼が来ています！") ||
             taskMessage.content.includes("締め切り日の24時間前です！")
         ) {
             const description = taskMessage.embeds[0]?.description;
