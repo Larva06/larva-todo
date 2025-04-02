@@ -38,7 +38,11 @@ const getTaskCompletionInfo = (message: Message): TaskCompletionInfo | null => {
 };
 
 // eslint-disable-next-line max-statements
-const sendCompletionMessage = async (taskMessage: Message, user: User | PartialUser): Promise<void> => {
+const sendStatusMessage = async (
+    taskMessage: Message,
+    user: User | PartialUser,
+    isComplete: boolean
+): Promise<void> => {
     const taskInfo = getTaskCompletionInfo(taskMessage);
     if (!taskInfo) {
         logError("タスクのメッセージから必要な情報を取得できませんでした。");
@@ -53,8 +57,9 @@ const sendCompletionMessage = async (taskMessage: Message, user: User | PartialU
         return;
     }
 
-    const completionMessage = format(messages.guild.taskCheck.completion, user.displayName, assigneeName, taskContent);
-    await channel.send(completionMessage);
+    const messageTemplate = isComplete ? messages.guild.taskCheck.completion : messages.guild.taskCheck.incomplete;
+    const statusMessage = format(messageTemplate, user.displayName, assigneeName, taskContent);
+    await channel.send(statusMessage);
 };
 
 const convertMentionableToUserOrRole = (
@@ -145,8 +150,8 @@ const slashCommand = {
         const interactionCallbackResponse = await interaction.reply({
             content: format(messages.guild.taskCheck.title, assignee.toString()),
             embeds: [taskCheckEmbed],
-            withResponse: true,
-            ephemeral: true
+            ephemeral: true,
+            withResponse: true
         });
 
         await writeToSheet({
@@ -162,12 +167,14 @@ const slashCommand = {
         const channel = await interaction.client.channels.fetch(CHANNEL_ID);
 
         if (channel instanceof TextChannel) {
-
             const taskMessage = await channel.send({
-                content: format(messages.guild.task.title, assignee.toString(),interaction.user.displayName.toString()),
+                content: format(
+                    messages.guild.task.title,
+                    assignee.toString(),
+                    interaction.user.displayName.toString()
+                ),
                 embeds: [taskCheckEmbed]
             });
-        
             const { resource } = interactionCallbackResponse;
             if (!resource?.message) {
                 logError(messages.log.messageSendFail);
@@ -210,7 +217,7 @@ const onReactionChange = async (
         const taskMessage = await reaction.message.fetch();
 
         if (
-            taskMessage.content.includes("下記の内容で依頼を送信します！") ||
+            taskMessage.content.includes("さんから依頼が来ています！") ||
             taskMessage.content.includes("締め切り日の24時間前です！")
         ) {
             const description = taskMessage.embeds[0]?.description;
@@ -224,10 +231,11 @@ const onReactionChange = async (
             if (type === "added") {
                 logInfo(`リアクションが追加されました。タスクID: ${taskId}`);
                 await updateTaskCompletion(taskId);
-                await sendCompletionMessage(taskMessage, user);
+                await sendStatusMessage(taskMessage, user, true);
             } else {
                 logInfo(`リアクションが削除されました。タスクID: ${taskId}`);
                 await resetTaskCompletion(taskId);
+                await sendStatusMessage(taskMessage, user, false);
             }
         }
     }
