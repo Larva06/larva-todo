@@ -112,7 +112,7 @@ const getUncompletedTasks = async (): Promise<TaskDataForSheets[]> => {
         }
 
         return rows
-            .filter((row) => row[5] === "FALSE")
+            .filter((row) => row[6] === "FALSE")
             .map(
                 (row) =>
                     ({

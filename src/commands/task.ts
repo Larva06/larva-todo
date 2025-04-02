@@ -74,7 +74,7 @@ const convertMentionableToUserOrRole = (
     }
 
     if ("user" in mentionable) {
-        return mentionable.user;
+        return mentionable.user;    
     }
 
     return null;
@@ -175,18 +175,17 @@ const slashCommand = {
                 ),
                 embeds: [taskCheckEmbed]
             });
-
             const { resource } = interactionCallbackResponse;
             if (!resource?.message) {
                 logError(messages.log.messageSendFail);
                 return;
             }
-
+        
             // リアクションを追加
             await taskMessage.react("✅");
         } else {
             logError(messages.log.messageSendFail);
-        }
+        }        
     }
 };
 
