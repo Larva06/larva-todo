@@ -5,13 +5,11 @@ import { logError, logInfo } from "./log.js";
 import messages from "./data/messages.json" with { type: "json" };
 
 const SCOPES = ["https://www.googleapis.com/auth/spreadsheets"];
-const auth = new $auth.JWT(
-    GOOGLE_SERVICE_ACCOUNT_EMAIL,
-    // eslint-disable-next-line no-undefined
-    undefined,
-    GOOGLE_PRIVATE_KEY.replace(/\\n/gu, "\n"),
-    SCOPES
-);
+const auth = new $auth.JWT({
+    email: GOOGLE_SERVICE_ACCOUNT_EMAIL,
+    key: GOOGLE_PRIVATE_KEY.replace(/\\n/gu, "\n"),
+    scopes: SCOPES
+});
 
 const taskSheets = sheets({ auth, version: "v4" });
 
