@@ -17,7 +17,7 @@
   "description": "",
   "dependencies": {
     "@googleapis/sheets": "^11.0.0",
-    "discord.js": "^14.17.3",
+    "discord.js": "^14.21.0",
     "typescript": "^5.8.2"
   },
   "devDependencies": {
