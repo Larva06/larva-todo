@@ -36,8 +36,7 @@ client.once(Events.ClientReady, () => {
 
 client.on(Events.InteractionCreate, (interaction) => {
     void (async (): Promise<void> => {
-        if (!interaction.isCommand()) return;
-
+        if (!interaction.isChatInputCommand()) return;
         if (interaction.commandName === "task") {
             await slashCommand.execute(interaction);
         }
