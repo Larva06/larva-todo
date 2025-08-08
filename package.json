@@ -16,12 +16,12 @@
   "license": "MIT",
   "description": "",
   "dependencies": {
-    "@googleapis/sheets": "^9.4.0",
+    "@googleapis/sheets": "^11.0.0",
     "discord.js": "^14.17.3",
     "typescript": "^5.8.2"
   },
   "devDependencies": {
-    "@robot-inventor/eslint-config": "^8.0.0",
+    "@robot-inventor/eslint-config": "^10.0.0",
     "@types/node": "^22.13.0",
     "eslint": "^9.21.0",
     "prettier": "^3.5.2"

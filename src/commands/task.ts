@@ -1,9 +1,8 @@
 import {
     type APIInteractionDataResolvedGuildMember,
     type APIRole,
+    type ChatInputCommandInteraction,
     type Client,
-    type CommandInteraction,
-    type CommandInteractionOptionResolver,
     Events,
     type GuildMember,
     type Message,
@@ -110,8 +109,8 @@ const slashCommand = {
         ),
 
     // eslint-disable-next-line max-statements, max-lines-per-function
-    execute: async (interaction: CommandInteraction): Promise<void> => {
-        const options = interaction.options as CommandInteractionOptionResolver;
+    execute: async (interaction: ChatInputCommandInteraction): Promise<void> => {
+        const { options } = interaction;
 
         const taskId = randomUUID();
         const taskContent = options.getString("task-content", true);
