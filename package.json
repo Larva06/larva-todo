@@ -22,7 +22,7 @@
   },
   "devDependencies": {
     "@robot-inventor/eslint-config": "^11.0.0",
-    "@types/node": "^24.3.0",
+    "@types/node": "^25.0.3",
     "eslint": "^9.21.0",
     "prettier": "^3.5.2"
   }
